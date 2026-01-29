@@ -23,15 +23,15 @@ const ItemSchema = new mongoose.Schema({
     _id: false
 });
 
-//the invoura schema
-const invouraSchema = new mongoose.Schema({
+//the invoice schema
+const invoiceSchema = new mongoose.Schema({
     owner: {
         type: String,
         required: true,
         index: true
     }, //it is clerk id
     //it must be unique for each
-    invouraNumber: {
+    invoiceNumber: {
         type: String,
         required: true,
         index: true
@@ -79,5 +79,5 @@ const invouraSchema = new mongoose.Schema({
     timestamps: true
 });
 
-const Invoura = mongoose.models.Invoura || mongoose.model("Invoura", invouraSchema);
-export default Invoura;
+const Invoice = mongoose.models.Invoice || mongoose.model("Invoice", invoiceSchema);
+export default Invoice;

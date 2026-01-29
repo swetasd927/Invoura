@@ -1,5 +1,5 @@
 import mongoose  from "mongoose";
-import Invoura from "../models/InvouraModel.js";
+import Invoice from "../models/InvoiceModel.js";
 import { getAuth } from "@clerk/express";
 
 const API_BASE = 'http://localhost:5000';
@@ -65,15 +65,13 @@ async function generateUniqueInvoiceNumber(attempts = 8){
         const suffix = Math.floor(Math.random() * 9000).toString().padStart(6, "0");
         const candidate = `INV-${ts.slice(-6)}-${suffix}`;
 
-        const exists = await Invoura.exists({ invouraNumber: candidate });
+        const exists = await Invoice.exists({ invoiceNumber: candidate });
         if(!exists) return candidate;
         await new Promise((r) => setTimeout(r, 2));
     }
     return new mongoose.Types.ObjectId().toString();
 }
 //to create a invoice
-//bro just change invoura to invoice its not gonna happen the way you want
-
 //CREATE
 export async function createInvoice(req, res){
     try{
@@ -95,13 +93,13 @@ export async function createInvoice(req, res){
 
         //if client supplied invoiceNumber, ensure it doesn't already exist
         let invoiceNumberProvided = 
-            typeof body.invouraNumber === "string" && body.invouraNumber.trim()
-                ?String(body.invouraNumber).trim()
+            typeof body.invoiceNumber === "string" && body.invoiceNumber.trim()
+                ?String(body.invoiceNumber).trim()
                 :null;
 
             //invoice number if present then error else ok because invoiceNumber must be unique.
             if(invoiceNumberProvided){
-                const duplicate = await Invoice.exists({ invoiceNumberProvided });
+                const duplicate = await Invoice.exists({ invoiceNumber: invoiceNumberProvided });
                 if(duplicate){
                     return res
                     .status(409)
@@ -136,9 +134,63 @@ export async function createInvoice(req, res){
                 taxPercent,
                 logoDataUrl:
                     fileUrls.logoDataUrl || body.logoDataUrl || body.logo || null,
-
-
-            })
+                stampDataUrl:
+                    fileUrls.stampDataUrl || body.stampDataUrl || body.stamp || null,
+                signatureDataUrl:
+                    fileUrls.signatureDataUrl ||
+                    body.signatureDataUrl || 
+                    body.signature ||
+                    null,
+                signatureName: body.signatureName || "",
+                signatureTitle: body.signatureTitle || "",
+                notes: body.notes || body.aiSource || "",
+            });
+            //Save with retry on duplicate-key(race conditions)
+            let saved = null;
+            let attempts = 0;
+            const maxSaveAttempts = 6;
+            while(attempts < maxSaveAttempts){
+                try{
+                    saved = await doc.save();
+                    break; //success
+                } catch(err){
+                    //If dublicate invoiceNumber (race), regenerate and retry
+                    if(err && err.code === 11000 && err.keyPattern && err.keyPattern.invoiceNumber){
+                        attempts += 1;
+                        //generate a new invoiceNumber and set on doc
+                        const newNumber = await generateUniqueInvoiceNumber();
+                        doc.invoiceNumber = newNumber;
+                        //loop to try save again
+                        continue;
+                    }
+                    //other error -> rethrow
+                    throw err;
+                }
+                if(!saved){
+                    return res.status(500).json({
+                        success: false,
+                        message: "failed to create invoice after multiple attempts",
+                    });
+                }
+                return res
+                    .status(201)
+                    .json({ success: true, message: "Invoice created", data: saved });
+            }
+            
+            } catch (err){
+                console.error("createInvoice error:", err);
+                if(err.type === "entity.too.large"){
+                    return res
+                        .status(413)
+                        .json({ success: false, message: "Payload too large" });
+                }
+                //handle duplicate key at top-level just in case
+                if(err && err.code === 11000 && err.keyPattern && err.keyPattern.invoiceNumber){
+                    return res
+                        .status(409)
+                        .json({ success: false, message: "Invoice number already exists" });
+                }
+                return res.status(500).json({ success: false, message: "Server error" });
+            }
 
     }
-}
