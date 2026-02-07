@@ -7,7 +7,6 @@ import { createBusinessProfile, updateBusinessProfile } from '../controllers/bus
 
 const businessProfileRouter = express.Router();
 
-//multer
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path.join(process.cwd(), "uploads"));        

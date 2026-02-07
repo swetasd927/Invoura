@@ -11,14 +11,14 @@ function computeTotals(items = [], taxtPercent = 0){
         (s, it) => s + (Number(it.qty || 0 * Number(it.unitPrice || 0))),
         0
     );
-    const tax = (subtotal + Number(taxtPercent || 0)) / 100;
+    const tax = (subtotal * Number(taxtPercent || 0)) / 100;
     const total = subtotal + tax;
     return {subtotal, tax, total}
     //compute subtotal, tax and total    
 }
 
 //Parse FormData items
-    function parseItemsField(val){
+    function parseItemsField(val){//no matter what format comes in,converts it into usable array
         if(!val) return [];
         if(Array.isArray(val)) return val;
         if(typeof val === "string"){
@@ -63,7 +63,10 @@ function uploadedFilesToUrls(req){
 async function generateUniqueInvoiceNumber(attempts = 8){
     for(let i = 0; i< attempts; i++){
         const ts = Date.now().toString();
-        const suffix = Math.floor(Math.random() * 9000).toString().padStart(6, "0");
+        const suffix = Math.floor(Math.random() * 9000)
+                            .toString()
+                            .padStart(6, "0");
+                            //generates random number and ensures its six digits
         const candidate = `INV-${ts.slice(-6)}-${suffix}`;
 
         const exists = await Invoice.exists({ invoiceNumber: candidate });
@@ -188,7 +191,7 @@ export async function createInvoice(req, res){
                 //handle duplicate key at top-level just in case
                 if(err && err.code === 11000 && err.keyPattern && err.keyPattern.invoiceNumber){
                     return res
-                        .status(409)
+                        .status(409)//conflict
                         .json({ success: false, message: "Invoice number already exists" });
                 }
                 return res.status(500).json({ success: false, message: "Server error" });
@@ -218,6 +221,7 @@ export async function getInvoices(req, res) {
             ];
         }
         const invoices = (await Invoice.find(q)).sort({createdAr: -1}).lean();
+        //"Get all invoices matching q, newest first, as plain objects."
         return res.status(200).json({
             success: true,
             data: invoices
