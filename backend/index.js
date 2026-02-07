@@ -6,6 +6,7 @@ import { connectDB } from './config/db.js';
 import path from 'path';
 import invoiceRouter from './routes/InvoiceRouter.js';
 import businessProfileRouter from './routes/businessProfileRoutes.js';
+import aiInvoiceRouter from './routes/aiinvoiceRouter.js';
 
 const app = express();
 const port = 5000;
@@ -23,7 +24,8 @@ connectDB();
 //Routes
 app.use('/uploads', express.static(path.join(process.cwd(), "uploads")));
 app.use('/api/invoice', invoiceRouter);
-app.use('api/businessProfile', businessProfileRouter);
+app.use('/api/businessProfile', businessProfileRouter);
+app.use('/api/ai', aiInvoiceRouter);
 
 app.get('/',( req, res ) => {
     res.send("API is working");

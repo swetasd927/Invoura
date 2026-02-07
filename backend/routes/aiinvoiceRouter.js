@@ -136,6 +136,14 @@ aiInvoiceRouter.post('/generate', async (requestAnimationFrame, res) => {
         }
         if(!lastText){
             const errMsg = 
+            (lastErr && lastErr.message) ||
+            "All candidate models failed. Check API key, network, or model availability.";
+            console.error("AI generation failed (no text):", errMsg);
+            return res.status(502).json({
+                success: false,
+                message: "AI generation failed",
+                detail: errMsg
+            });
         }
 
         const text = lastText.trim();
@@ -153,9 +161,38 @@ aiInvoiceRouter.post('/generate', async (requestAnimationFrame, res) => {
                 model: usedModel
             });
         }
-        return { text: String(text).trim(), modelName };
+        const jsonText = text.slice(firstBrace, lastBrace + 1);
+        let data;
+        try{
+            data = JSON.parse(jsonText);
+        } catch (parseErr) {
+            console.error("Failed to parse JSON from AI response:", parseErr, {
+                model: usedModel,
+                jsonText
+            }
+            );
+            return res.status(502).json({
+                success: false,
+                message: "AI returns invalid JSON",
+                model: usedModel,
+                raw: text
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            model: usedModel,
+            data
+        });
     }
+    
     catch (error) {
-
+        console.error("AI invoice generation error:", err);
+        return res.status(500).json({
+            success: false,
+            message: "AI generation failed",
+            detail: error?.message || String(err)
+        })
     }
-})
+});
+
+export default aiInvoiceRouter;
