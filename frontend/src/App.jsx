@@ -1,14 +1,13 @@
-import React from 'react'
-import logo from "./assets/logo.png";
+import React from 'react';
+import {Routes, Route } from 'react-router-dom'
+import Home from './pages/Home.jsx';
 
 const App = () => {
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">
-        Hello world!
-      </h1>
-    </div>
-  )
-}
+    <Routes>
+      <Route path = '/' element = {<Home />} />
+    </Routes>
+  );
+};
 
 export default App
