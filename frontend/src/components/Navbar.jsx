@@ -34,6 +34,7 @@ const fetchAndStoreToken = useCallback(async () => {
                 console.log(token);
             }
             catch (err) {
+                return null;
             }
                 return token;
             }
@@ -85,6 +86,24 @@ useEffect(() => {
     }
 })
 
+//close profile popover an outside cick
+useEffect(() => {
+    function onDocClick(e) {
+        if(!profileRef.current) return;
+        if(!profileRef.current.contains(e.target)){
+            setProfileOpen(false);
+        }
+    }
+    if(profileOpen) {
+        document.addEventListener("mousedown", onDocClick);
+        document.addEventListener("touchstart", onDocClick);
+    }
+    return () => {
+        document.removeEventListener("mousedown", onDocClick);
+        document.removeEventListener("touchstart", onDocClick);
+    };
+}, [profileOpen]);
+
     // to open login modal
     function openSignIn(){
         try{
@@ -100,7 +119,6 @@ useEffect(() => {
         }
     }
 
-    
     // to open signup modal
     function openSignUp(){
         try{
