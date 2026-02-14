@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from "react-router-dom";
 
 import {navbarStyles} from '../assets/dummyStyles';
-import logo from '../assets/transparentLogo.png'
+import logo from '../assets/logo.png'
 import { useUser } from '@clerk/clerk-react'; 
 import { useRef } from 'react';
 import { useAuth, useClerk } from '@clerk/clerk-react';
@@ -140,7 +140,7 @@ useEffect(() => {
             <nav className={navbarStyles.logoSection}>
                 <div className={navbarStyles.logoSection}>
                     <Link to = '/' className = {navbarStyles.logoLink}>
-                        <img src={logo} alt="Logo" className={navbarStyles.logoImage} />
+                        <img src={logo} alt="logo" className={navbarStyles.logoImage} />
                         <span className={navbarStyles.logoText}>Invoura</span>
 
                     </Link>
