@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { appShellStyles } from "../assets/dummyStyles";
 import logo from "../assets/logo.png";
 import { useClerk, useUser } from "@clerk/clerk-react";
-import { Link, NavLink } from "react-router-dom";
-
-import { useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 const AppShell = () => {
   const navigate = useNavigate();
@@ -479,10 +477,17 @@ const AppShell = () => {
                     {initials()}
                     <div className={appShellStyles.userAvatarBorder} />
                   </div>
+                  <div className={appShellStyles.userStatus}></div>
                 </div>
               </div>
             </div>
           </header>
+
+          <main className={appShellStyles.main}>
+                <div className={appShellStyles.mainContainer}>
+                    <Outlet />
+                </div>
+          </main>
         </div>
       </div>
     </div>
