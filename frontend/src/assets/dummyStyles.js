@@ -876,8 +876,11 @@ export const pricingStyles = {
   // Billing Toggle
   billingToggle: "inline-flex items-center bg-white/80 backdrop-blur-sm rounded-2xl p-2 border border-gray-200/60 shadow-sm",
   billingButton: "px-6 py-3 rounded-xl font-semibold transition-all duration-300",
-  billingButtonActive: "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg",
+  billingButtonActive: "!bg-blue-600 text-white shadow-lg",
   billingButtonInactive: "text-gray-600 hover:text-gray-900",
+
+  // billingButtonActive: "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg",
+  // billingButtonInactive: "text-gray-600 hover:text-gray-900",
   billingBadge: "ml-2 text-sm line-clamp-2 md:line-clamp-0 lg:line-clamp-0 xl:line-clamp-0 bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full",
   
   // Pricing Grid
