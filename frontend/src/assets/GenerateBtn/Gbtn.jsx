@@ -1,7 +1,6 @@
 // assets/generatebtn.jsx
 import React from "react";
-import "./generatebtn.css";
-
+import "./Gbtn.css"
 const GenerateBtn = ({ text = "Generate", onClick }) => {
   return (
     <button className="generate-btn" onClick={onClick}>
