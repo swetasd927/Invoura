@@ -55,7 +55,7 @@ export async function createBusinessProfile(req, res){
                 message: "Business Profile Created."
             })
         }
-    }
+    
     catch(err){
         console.log("Create Business Profile error:", err);
         return res.status(500).json({
@@ -143,7 +143,7 @@ export async function getBusinessProfile(req, res){
         }
         const profile = await BusinessProfile.findOne({owner: userId}).lean();
         if(!profile){
-            return res.status({
+            return res.status(404).json({
                 success: true,
                 message: "No profile found"
             })
@@ -154,7 +154,7 @@ export async function getBusinessProfile(req, res){
         });
     }catch (err){
         console.log("GetBusiness Profile error:", err);
-        return rs.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Server Error"
         })

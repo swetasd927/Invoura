@@ -220,7 +220,7 @@ export async function getInvoices(req, res) {
                 { invoiceNumber: { $regex: search, $options: "i" }},
             ];
         }
-        const invoices = (await Invoice.find(q)).sort({createdAr: -1}).lean();
+        const invoices = await Invoice.find(q).sort({createdAr: -1}).lean();
         //"Get all invoices matching q, newest first, as plain objects."
         return res.status(200).json({
             success: true,
