@@ -7,7 +7,8 @@ import Dashboard from './pages/Dashboard.jsx';
 import Createinvoice from './pages/Createinvoice.jsx';
 import Invoices from './pages/Invoices.jsx';
 import InvoicePreview from './components/InvoicePreview.jsx';
-import BusinessProfile from './c'
+import BusinessProfile from './components/BusinessProfile.jsx'
+import NotFound from './pages/NotFound.jsx';
 
 const ClerkProtected = ({children}) => (
   <>

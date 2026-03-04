@@ -1,4 +1,4 @@
-import react from 'react';
+import react, {useState, useEffect} from 'react';
 import {businessProfileStyles, iconColors, customStyles} from '../assets/dummyStyles'
 import {useAuth, useUser} from '@clerk/clerk-react';
 
@@ -369,7 +369,7 @@ const BusinessProfile = () => {
                     <div style = {{
                         marginTop: 12,
                         color: '#92400e',
-                        background: '#fff7ed'
+                        background: '#fff7ed',
                         padding: 10,
                         borderRadius: 8,
 
@@ -456,7 +456,7 @@ const BusinessProfile = () => {
     <label className = {businessProfileStyles.label}>GST Number</label>
     <input 
     className = {businessProfileStyles.input}
-    value = {meta.gst || "}
+    value = {meta.gst || ""}
     onChange = {(e) => updateMeta("gst", e.target.value)}
     placeholder = "27DFGJSDKFJLK2LKDJG"
     
@@ -574,22 +574,23 @@ const BusinessProfile = () => {
                             Default Tax Percentage
                         </label>
                         <div className = "flex item-center gap-3">
-                            <input type = "number" min = "0" max = "100" step = "0.1" 
-                            className = {businessProfileStyles.taxInput}
-                            value = {meta.defaultTaxPercent ?? 18 
-                                onChange = {(e) => 
+                            <input 
+                            type = "number" 
+                            min = "0" 
+                            max = "100" 
+                            step = "0.1" 
+                            className = {businessProfileStyles.taxInput} value = {meta.defaultTaxPercent ?? 18} onChange = {(e) => 
                                     updateMeta(
                                         "defaultTaxPercent",
                                         Number(e.target.value || 0)
                                     )
                                 }
-                            } 
+                            
                             />
                             <span className = {customStyles.taxPercentage}>%</span>
-                        </div>
+                            </div>
                         <p className = {businessProfileStyles.taxHelpText}>
-                            This tax reate will prefill in new invoices.
-                            You can adjust it as per invoice as needed.
+                            This tax reate will prefill in new invoices.You can adjust it as per invoice as needed.
                         </p>
                     </div>
                 </div>
@@ -712,5 +713,7 @@ const BusinessProfile = () => {
         </div>
     )
 }
+}
+
 
 export default BusinessProfile;
