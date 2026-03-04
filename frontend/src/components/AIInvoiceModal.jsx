@@ -15,7 +15,7 @@ const AIInvoiceModal = ({open, onClose, onGenerate, initialText = ""}) => {
     }, [open, initialText]);
 
     if(!open) return null;
-
+//hi
     async function handleGenerateClick() {
         setError("");
         const raw = (text || "").trim();
