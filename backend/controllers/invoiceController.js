@@ -3,7 +3,7 @@ import Invoice from "../models/InvoiceModel.js";
 import { getAuth } from "@clerk/express";
 import path from 'path';
 
-const API_BASE = process.env.API_BASE || 'http://localhost:5000';
+const API_BASE = process.env.API_BASE || 'http://localhost:5000';//fallback
 
 function computeTotals(items = [], taxPercent = 0){
     const safe = Array.isArray(items) ? items.filter(Boolean): [];
