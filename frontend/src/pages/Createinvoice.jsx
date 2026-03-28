@@ -73,13 +73,13 @@ function uid() {
   return Math.random().toString(36).slice(2, 9);
   //this generates random unique id
 }
-//currency in inr or us
-function currencyFmt(amount = 0, currency = "INR") {
+//currency in npr or us
+function currencyFmt(amount = 0, currency = "NPR") {
   try {
-    if (currency === "INR") {
-      return new Intl.NumberFormat("en-IN", {
+    if (currency === "NPR") {
+      return new Intl.NumberFormat("en-NP", {
         style: "currency",
-        currency: "INR",
+        currency: "NPR",
       }).format(amount);
     }
     return new Intl.NumberFormat("en-US", {
@@ -208,7 +208,7 @@ export default function CreateInvoice() {
       items: [
         { id: uid(), description: "Service / Item", qty: 1, unitPrice: 0 },
       ],
-      currency: "INR",
+      currency: "NPR",
       status: "draft",
       stampDataUrl: null,
       signatureDataUrl: null,
@@ -652,7 +652,7 @@ export default function CreateInvoice() {
         fromVat: invoice.fromVat || "",
         client: invoice.client || {},
         items: items || [],
-        currency: invoice.currency || "INR",
+        currency: invoice.currency || "NPR",
         status: invoice.status || "draft",
         taxPercent: Number(invoice.taxPercent ?? 18),
         subtotal: computeTotals(items, invoice.taxPercent).subtotal,
@@ -913,19 +913,19 @@ export default function CreateInvoice() {
             </label>
             <div className={createInvoiceStyles.currencyContainer}>
               <button
-                onClick={() => handleCurrencyChange("INR")}
+                onClick={() => handleCurrencyChange("NPR")}
                 className={`${createInvoiceStyles.currencyButton} ${
-                  invoice.currency === "INR"
+                  invoice.currency === "NPR"
                     ? createInvoiceStyles.currencyButtonActive1
                     : createInvoiceStyles.currencyButtonInactive
                 }`}
               >
                 <span className={createInvoiceCustomStyles.currencySymbol}>
-                  ₹
+                  रु
                 </span>
                 <div className="text-left">
-                  <div className="font-medium">Indian Rupee</div>
-                  <div className="text-xs opacity-70">INR</div>
+                  <div className="font-medium">Nepali Currency</div>
+                  <div className="text-xs opacity-70">NPR</div>
                 </div>
               </button>
 

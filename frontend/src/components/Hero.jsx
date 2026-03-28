@@ -177,10 +177,10 @@ const Hero = () => {
                               {[
                                     {
                                     description: "Website Design & Development",
-                                    amount: "₹15,000",
+                                    amount: "रु15,000",
                                     },
-                                    { description: "Consultation (2 hours)", amount: "₹3,000" },
-                                    { description: "Premium Hosting Setup", amount: "₹2,500" },
+                                    { description: "Consultation (2 hours)", amount: "रु3,000" },
+                                    { description: "Premium Hosting Setup", amount: "रु2,500" },
                                 ].map((item, index) => (
                                     <div key={index} className={heroStyles.itemRow}>
                                         <div className='flex items-center gap-3'>
@@ -202,17 +202,17 @@ const Hero = () => {
                     <span className={heroStyles.calculationLabel}>
                       Subtotal
                     </span>
-                    <span className={heroStyles.calculationValue}>₹20,500</span>
+                    <span className={heroStyles.calculationValue}>रु20,500</span>
                   </div>
                   <div className={heroStyles.calculationRow}>
                     <span className={heroStyles.calculationLabel}>
                       VAT (20%)
                     </span>
-                    <span className={heroStyles.calculationValue}>₹3,240</span>
+                    <span className={heroStyles.calculationValue}>रु3,240</span>
                   </div>
                   <div className={heroStyles.totalRow}>
                     <span className={heroStyles.totalLabel}>Total Amount</span>
-                    <span className={heroStyles.totalValue}>₹23,740</span>
+                    <span className={heroStyles.totalValue}>रु23,740</span>
                   </div>
                 </div>
                 
@@ -235,7 +235,7 @@ const Hero = () => {
                         <div className={heroStyles.aiIndicatorDot}></div>
                         <span>AI parsed from:</span>
                         <span className={heroStyles.aiIndicatorText}>
-                            "Invoice for web design - ₹15,000..."
+                            "Invoice for web design - रु15,000..."
                         </span>
                     </div>
 

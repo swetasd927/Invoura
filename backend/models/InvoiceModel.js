@@ -49,7 +49,7 @@ const invoiceSchema = new mongoose.Schema({
     fromEmail: { type: String, default: "" },
     fromAddress: { type: String, default: "" },
     fromPhone: { type: String, default: "" },
-    fromGst: { type: String, default: "" },
+    fromVat: { type: String, default: "" },
   
     //Client Info
     client: {

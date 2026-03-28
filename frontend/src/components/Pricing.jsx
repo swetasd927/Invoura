@@ -173,7 +173,7 @@ const Pricing = () => {
       {
         
         title: "Starter",
-        price: "₹0",
+        price: "रु0",
         period: "month",
         description: "Perfect for freelancers and small projects",
         features: [
@@ -187,7 +187,7 @@ const Pricing = () => {
       },
       {
         title: "Professional",
-        price: "₹499",
+        price: "रु499",
         period: "month",
         description: "For growing businesses and agencies",
         features: [
@@ -203,7 +203,7 @@ const Pricing = () => {
       },
       {
         title: "Enterprise",
-        price: "₹1,499",
+        price: "रु1,499",
         period: "month",
         description: "For large organizations with custom needs",
         features: [
@@ -221,7 +221,7 @@ const Pricing = () => {
     annual: [
       {
         title: "Starter",
-        price: "₹0",
+        price: "रु0",
         period: "month",
         description: "Perfect for freelancers and small projects",
         features: [
@@ -236,7 +236,7 @@ const Pricing = () => {
       },
       {
         title: "Professional",
-        price: "₹399",
+        price: "रु399",
         period: "month",
         description: "For growing businesses and agencies",
         features: [
@@ -253,7 +253,7 @@ const Pricing = () => {
       },
       {
         title: "Enterprise",
-        price: "₹1,199",
+        price: "रु1,199",
         period: "month",
         description: "For large organizations with custom needs",
         features: [

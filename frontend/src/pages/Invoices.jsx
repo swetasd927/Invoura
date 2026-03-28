@@ -82,13 +82,13 @@ function normalizeClient(raw) {
   }
   return { name: "", email: "", address: "", phone: "" };
 }
-//will give you in either inr or usd
-function formatCurrency(amount = 0, currency = "INR") {
+//will give you in either npr or usd
+function formatCurrency(amount = 0, currency = "NPR") {
   try {
-    if (currency === "INR") {
+    if (currency === "NPR") {
       return new Intl.NumberFormat("en-IN", {
         style: "currency",
-        currency: "INR",
+        currency: "NPR",
       }).format(amount);
     }
     return new Intl.NumberFormat(undefined, {
@@ -99,8 +99,7 @@ function formatCurrency(amount = 0, currency = "INR") {
     return `${currency} ${amount}`;
   }
 }
-
-/* ---------- date formatting helper: DD/MM/YYYY (e.g. 07/12/2025) ---------- */
+//formating date helper
 function formatDate(dateInput) {
   if (!dateInput) return "—";
   const d = dateInput instanceof Date ? dateInput : new Date(String(dateInput));
@@ -563,7 +562,7 @@ export default function InvoicesPage() {
         dueDate: "",
         client: clientPlaceholder || "",
         items: [],
-        currency: "INR",
+        currency: "NPR",
         status: "Draft",
         notes: "",
         taxPercent: 18,

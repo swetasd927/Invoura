@@ -39,7 +39,7 @@ export async function createBusinessProfile(req, res){
             email: body.email || "",
             address: body.address || "",
             phone: body.phone || "",
-            gst: body.gst || "",
+            vat: body.vat || "",
             logoUrl: fileUrls.logoUrl || body.logoUrl || null,
             stampUrl: fileUrls.stampUrl || body.stampUrl || null,
             signatureUrl: fileUrls.signatureUrl || body.signatureUrl || null,
@@ -96,7 +96,7 @@ export async function updateBusinessProfile(req, res){
         if(body.email !== undefined) update.email = body.email;
         if(body.address !== undefined) update.address = body.address;
         if(body.phone !== undefined) update.phone = body.phone;
-        if(body.gst !== undefined) update.gst = body.gst;
+        if(body.vat !== undefined) update.vat = body.vat;
 
         if(fileUrls.logoUrl) update.logoUrl = fileUrls.logoUrl;
         else if(body.logoUrl !== undefined) update.logoUrl = body.logoUrl;

@@ -84,12 +84,12 @@ const defaultProfile = {
   signatureTitle: "",
 };
 //it will show you the currency for the invoice
-function currencyFmt(amount = 0, currency = "INR") {
+function currencyFmt(amount = 0, currency = "NPR") {
   try {
-    if (currency === "INR") {
-      return new Intl.NumberFormat("en-IN", {
+    if (currency === "NPR") {
+      return new Intl.NumberFormat("en-NP", {
         style: "currency",
-        currency: "INR",
+        currency: "NPR",
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       }).format(amount);
@@ -235,7 +235,7 @@ export default function InvoicePreview() {
                 ? [...data.items]
                 : [],
               invoiceNumber: data.invoiceNumber ?? data.invoiceNumber ?? "",
-              currency: data.currency || "INR",
+              currency: data.currency || "NPR",
             };
             setInvoice(normalized);
             return;
@@ -435,7 +435,7 @@ export default function InvoicePreview() {
   const signatureTitle = invoice.signatureTitle ?? profile.signatureTitle ?? "";
 
   const client = normalizeClient(invoice.client);
-  const invoiceCurrency = invoice.currency || "INR";
+  const invoiceCurrency = invoice.currency || "NPR";
 
 //rest is the UI
   return (

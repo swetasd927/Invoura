@@ -11,6 +11,7 @@ const businessProfileSchema = new mongoose.Schema({
     },
     email: {
         type: String,
+        unique: true,
         required: false,
         trim: true,
         lowercase: true,
@@ -18,17 +19,17 @@ const businessProfileSchema = new mongoose.Schema({
     },
     address: {
         type: String,
-        required: false,
+        required: true,
         default: ""
     },
     phone: {
         type: String,
-        required: false,
+        required: true,
         default: ""
     },
-    gst: {
+    vat: {
         type: String,
-        required: false,
+        required: true,
         default: ""
     },
     //for images
@@ -59,8 +60,8 @@ const businessProfileSchema = new mongoose.Schema({
     },
     defaultTaxPercent: {
         type: Number,
-        required: false,
-        default: 18
+        required: true,
+        default: 20
     }
 }, {
     timestamps: true

@@ -23,13 +23,13 @@ function normalizeClient(raw) {
   return { name: "", email: "", address: "", phone: "" };
 }
 
-function currencyFmt(amount = 0, currency = "INR") {
+function currencyFmt(amount = 0, currency = "NPR") {
   try {
     const n = Number(amount || 0);
-    if (currency === "INR")
-      return new Intl.NumberFormat("en-IN", {
+    if (currency === "NPR")
+      return new Intl.NumberFormat("en-NP", {
         style: "currency",
-        currency: "INR",
+        currency: "NPR",
       }).format(n);
     return new Intl.NumberFormat(undefined, {
       style: "currency",
@@ -100,14 +100,14 @@ function formatDate(dateInput) {
 
 // CHANGE 1: moved outside component
 const HARD_RATES = {
-  USD_TO_INR: 83,
+  USD_TO_NPR: 83,
 };
 
-function convertToINR(amount = 0, currency = "INR") {
+function convertToNPR(amount = 0, currency = "NPR") {
   const n = Number(amount || 0);
-  const curr = String(currency || "INR").trim().toUpperCase();
-  if (curr === "INR") return n;
-  if (curr === "USD") return n * HARD_RATES.USD_TO_INR;
+  const curr = String(currency || "NPR").trim().toUpperCase();
+  if (curr === "NPR") return n;
+  if (curr === "USD") return n * HARD_RATES.USD_TO_NPR;
   return n;
 }
 
@@ -167,7 +167,7 @@ const Dashboard = () => {
       const mapped = (Array.isArray(raw) ? raw : []).map((inv) => {
         const clientObj = inv.client ?? {};
         const amountVal = Number(inv.total ?? inv.amount ?? 0);
-        const currency = (inv.currency || "INR").toUpperCase();
+        const currency = (inv.currency || "NPR").toUpperCase();
 
         return {
           ...inv,
@@ -239,15 +239,15 @@ const Dashboard = () => {
         typeof inv.amount === "number"
           ? inv.amount
           : Number(inv.total ?? inv.amount ?? 0);
-      const invCurrency = inv.currency || "INR";
-      const amtInINR = convertToINR(rawAmount, invCurrency);
+      const invCurrency = inv.currency || "NPR";
+      const amtInNPR = convertToNPR(rawAmount, invCurrency);
 
       if (inv.status === "Paid") {
-        totalPaid += amtInINR;
+        totalPaid += amtInNPR;
         paidCount++;
       }
       if (inv.status === "Unpaid" || inv.status === "Overdue") {
-        totalUnpaid += amtInINR;
+        totalUnpaid += amtInNPR;
         unpaidCount++;
       }
     });
@@ -340,15 +340,15 @@ const Dashboard = () => {
           />
           <KpiCard
             title="Total Paid"
-            value={currencyFmt(kpis.totalPaid, "INR")}
-            hint="Recieved Amount(INR)"
+            value={currencyFmt(kpis.totalPaid, "NPR")}
+            hint="Recieved Amount(NPR)"
             iconType="revenue"
             trend={12.2}
           />
           <KpiCard
             title="Total unpaid"
-            value={currencyFmt(kpis.totalUnpaid, "INR")}
-            hint="Outstanding balance(INR)"
+            value={currencyFmt(kpis.totalUnpaid, "NPR")}
+            hint="Outstanding balance(NPR)"
             iconType="clock"
             trend={-3.1}
           />
@@ -380,7 +380,7 @@ const Dashboard = () => {
                       kpis.totalInvoices > 0
                         ? (kpis.totalPaid + kpis.totalUnpaid) / kpis.totalInvoices
                         : 0,
-                      "INR"
+                      "NPR"
                     )}
                   </span>
                 </div>

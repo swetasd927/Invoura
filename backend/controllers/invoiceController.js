@@ -3,15 +3,15 @@ import Invoice from "../models/InvoiceModel.js";
 import { getAuth } from "@clerk/express";
 import path from 'path';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = process.env.API_BASE || 'http://localhost:5000';
 
-function computeTotals(items = [], taxtPercent = 0){
+function computeTotals(items = [], taxPercent = 0){
     const safe = Array.isArray(items) ? items.filter(Boolean): [];
     const subtotal = safe.reduce(
-        (s, it) => s + (Number(it.qty || 0 * Number(it.unitPrice || 0))),
+        (s, it) => s + (Number(it.qty || 0) * Number(it.unitPrice || 0)),
         0
     );
-    const tax = (subtotal * Number(taxtPercent || 0)) / 100;
+    const tax = (subtotal * Number(taxPercent || 0)) / 100;
     const total = subtotal + tax;
     return {subtotal, tax, total}
     //compute subtotal, tax and total    
@@ -73,7 +73,9 @@ async function generateUniqueInvoiceNumber(attempts = 8){
         if(!exists) return candidate;
         await new Promise((r) => setTimeout(r, 2));
     }
-    return new mongoose.Types.ObjectId().toString();
+    //return new mongoose.Types.ObjectId().toString();
+    throw new Error("Could not generate a unique invoice number after maximum attempts");
+
 }
 //to create a invoice
 //CREATE
@@ -124,7 +126,7 @@ export async function createInvoice(req, res){
                 fromEmail: body.fromEmail || "",
                 fromAddress: body.fromAddress || "",
                 fromPhone: body.fromPhone || "",
-                fromGst: body.fromGst || "",
+                fromVat: body.fromVat || "",
                 client:
                     typeof body.client === "string" && body.client.trim()
                         ? { name: body.client }
@@ -170,7 +172,9 @@ export async function createInvoice(req, res){
                     //other error -> rethrow
                     throw err;
                 }
-                if(!saved){
+                
+            }
+            if(!saved){
                     return res.status(500).json({
                         success: false,
                         message: "failed to create invoice after multiple attempts",
@@ -179,7 +183,6 @@ export async function createInvoice(req, res){
                 return res
                     .status(201)
                     .json({ success: true, message: "Invoice created", data: saved });
-            }
             
             } catch (err){
                 console.error("createInvoice error:", err);
@@ -220,7 +223,7 @@ export async function getInvoices(req, res) {
                 { invoiceNumber: { $regex: search, $options: "i" }},
             ];
         }
-        const invoices = await Invoice.find(q).sort({createdAr: -1}).lean();
+        const invoices = await Invoice.find(q).sort({createdAt: -1}).lean();
         //"Get all invoices matching q, newest first, as plain objects."
         return res.status(200).json({
             success: true,
@@ -252,7 +255,7 @@ export async function getInvoiceById(req, res){
         else inv = await Invoice.findOne({invoiceNumber: id});
 
         if(!inv)
-            return res.status(400).json({
+            return res.status(404).json({
                 success: false,
                 message: "Invoice not found"
         });
@@ -313,12 +316,15 @@ export async function updateInvoice(req, res){
         }
         let items = [];
         if(Array.isArray(body.items)) items = body.items;
-        else if(typeof body.items === "string" && body.item.length){
+        else if(typeof body.items === "string" && body.items.length){
             try{
                 items = JSON.parse(body.items);
             }catch{
                 items = [];
             }
+            //preserving whats already in the DB
+            } else {
+                items = existing.items;
         }
         const taxPercent = Number(
             body.taxPercent ?? body.tax ?? body.defaultTaxPercent ?? existing.taxPercent ?? 0
@@ -328,14 +334,14 @@ export async function updateInvoice(req, res){
 
         //to update we can update this fields
         const update = {
-            invoiceNumber: body.invoiceNumber,
+            invoiceNumber: body.invoiceNumber?.trim() || undefined,
             issueDate: body.issueDate,
             dueDate: body.dueDate,
             fromBusinessName: body.fromBusinessName,
             fromEmail: body.fromEmail,
             fromAddress: body.fromAddress,
             fromPhone: body.fromPhone,
-            fromGst: body.fromGst,
+            fromVat: body.fromVat,
             client:
                 typeof body.client === "string" && body.client.trim()
                     ? { name: body.client }
@@ -347,12 +353,7 @@ export async function updateInvoice(req, res){
             currency: body.currency,
             status: body.status ? String(body.status).toLowerCase(): undefined,
             taxPercent,
-            logoDataUrl:
-                fileUrls.logoDataUrl ||
-                (body.logoDataUrl || body.logo) ||
-                undefined,
-                taxPercent,
-                logoDataUrl:
+               logoDataUrl:
                     fileUrls.logoDataUrl ||
                     (body.logoDataUrl || body.logo) ||
                     undefined,
