@@ -203,7 +203,7 @@ export default function CreateInvoice() {
       fromEmail: "",
       fromAddress: "",
       fromPhone: "",
-      fromGst: "",
+      fromVat: "",
       client: { name: "", email: "", address: "", phone: "" },
       items: [
         { id: uid(), description: "Service / Item", qty: 1, unitPrice: 0 },
@@ -396,7 +396,7 @@ export default function CreateInvoice() {
           email: data.email ?? "",
           address: data.address ?? "",
           phone: data.phone ?? "",
-          gst: data.gst ?? "",
+          vat: data.vat ?? "",
           defaultTaxPercent: data.defaultTaxPercent ?? 18,
           signatureOwnerName: data.signatureOwnerName ?? "",
           signatureOwnerTitle: data.signatureOwnerTitle ?? "",
@@ -418,8 +418,8 @@ export default function CreateInvoice() {
             !prev.fromAddress || prev.fromAddress.trim() === "";
           const shouldOverwritePhone =
             !prev.fromPhone || prev.fromPhone.trim() === "";
-          const shouldOverwriteGst =
-            !prev.fromGst || prev.fromGst.trim() === "";
+          const shouldOverwriteVat =
+            !prev.fromVat || prev.fromVat.trim() === "";
 
           const merged = {
             ...prev,
@@ -435,7 +435,7 @@ export default function CreateInvoice() {
             fromPhone: shouldOverwritePhone
               ? serverProfile.phone
               : prev.fromPhone,
-            fromGst: shouldOverwriteGst ? serverProfile.gst : prev.fromGst,
+            fromVat: shouldOverwriteVat ? serverProfile.vat : prev.fromVat,
             logoDataUrl:
               prev.logoDataUrl ||
               resolveImageUrl(serverProfile.logoUrl) ||
@@ -649,7 +649,7 @@ export default function CreateInvoice() {
         fromEmail: invoice.fromEmail || "",
         fromAddress: invoice.fromAddress || "",
         fromPhone: invoice.fromPhone || "",
-        fromGst: invoice.fromGst || "",
+        fromVat: invoice.fromVat || "",
         client: invoice.client || {},
         items: items || [],
         currency: invoice.currency || "INR",
@@ -1068,11 +1068,11 @@ export default function CreateInvoice() {
                 />
               </div>
               <div>
-                <label className={createInvoiceStyles.label}>GST Number</label>
+                <label className={createInvoiceStyles.label}>VAT Number</label>
                 <input
-                  value={invoice?.fromGst ?? ""}
+                  value={invoice?.fromVat ?? ""}
                   onChange={(e) =>
-                    updateInvoiceField("fromGst", e.target.value)
+                    updateInvoiceField("fromVat", e.target.value)
                   }
                   placeholder="27AAAPL1234C1ZV"
                   className={createInvoiceStyles.input}

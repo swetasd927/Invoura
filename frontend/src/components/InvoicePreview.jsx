@@ -75,7 +75,7 @@ const defaultProfile = {
   email: "",
   address: "",
   phone: "",
-  gst: "",
+  vat: "",
   stampDataUrl: null,
   signatureDataUrl: null,
   logoDataUrl: null,
@@ -287,7 +287,7 @@ export default function InvoicePreview() {
             email: data.email ?? defaultProfile.email,
             address: data.address ?? defaultProfile.address,
             phone: data.phone ?? defaultProfile.phone,
-            gst: data.gst ?? defaultProfile.gst,
+            vat: data.vat ?? defaultProfile.vat,
             stampDataUrl:
               data.stampUrl ?? data.stampDataUrl ?? defaultProfile.stampDataUrl,
             signatureDataUrl:
@@ -515,9 +515,9 @@ export default function InvoicePreview() {
                       {invoice.fromPhone || profile.phone}
                     </div>
                   ) : null}
-                  {invoice.fromGst || profile.gst ? (
+                  {invoice.fromVat || profile.vat ? (
                     <div>
-                      <strong>GST:</strong> {invoice.fromGst || profile.gst}
+                      <strong>VAT:</strong> {invoice.fromVat || profile.vat}
                     </div>
                   ) : null}
                 </div>

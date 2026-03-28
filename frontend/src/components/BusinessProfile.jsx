@@ -165,13 +165,13 @@ const BusinessProfile = () => {
           email: data.email ?? "",
           address: data.address ?? "",
           phone: data.phone ?? "",
-          gst: data.gst ?? "",
+          vat: data.vat ?? "",
           logoUrl: data.logoUrl ?? null,
           stampUrl: data.stampUrl ?? null,
           signatureUrl: data.signatureUrl ?? null,
           signatureOwnerName: data.signatureOwnerName ?? "",
           signatureOwnerTitle: data.signatureOwnerTitle ?? "",
-          defaultTaxPercent: data.defaultTaxPercent ?? 18,
+          defaultTaxPercent: data.defaultTaxPercent ?? 20,
           notes: data.notes ?? "",
           profileId: data._id ?? data.id ?? null,
         };
@@ -250,7 +250,11 @@ const BusinessProfile = () => {
   //to save the business profile in the DB
    async function handleSave(e) {
     e?.preventDefault();
-    setSaving(true);
+
+
+
+
+  setSaving(true);
 
     try {
       const token = await getAuthToken();
@@ -264,8 +268,8 @@ const BusinessProfile = () => {
       fd.append("email", meta.email || "");
       fd.append("address", meta.address || "");
       fd.append("phone", meta.phone || "");
-      fd.append("gst", meta.gst || "");
-      fd.append("defaultTaxPercent", String(meta.defaultTaxPercent ?? 18));
+      fd.append("vat", meta.vat || "");
+      fd.append("defaultTaxPercent", String(meta.defaultTaxPercent ?? 20));
       fd.append("signatureOwnerName", meta.signatureOwnerName || "");
       fd.append("signatureOwnerTitle", meta.signatureOwnerTitle || "");
       fd.append("notes", meta.notes || "");
@@ -305,7 +309,7 @@ const BusinessProfile = () => {
         email: saved.email ?? meta.email,
         address: saved.address ?? meta.address,
         phone: saved.phone ?? meta.phone,
-        gst: saved.gst ?? meta.gst,
+        vat: saved.vat ?? meta.vat,
         logoUrl: saved.logoUrl ?? meta.logoUrl,
         stampUrl: saved.stampUrl ?? meta.stampUrl,
         signatureUrl: saved.signatureUrl ?? meta.signatureUrl,
@@ -408,6 +412,9 @@ const BusinessProfile = () => {
                             </label>
                             <input className = {businessProfileStyles.input}
                             value = {meta.businessName || ""}
+                            required
+                            minLength={2}
+                            maxLength={100}
                             onChange = {(e) => updateMeta("businessName", e.target.value)}
                             placeholder = "Enter your business name "
                             />
@@ -421,6 +428,8 @@ const BusinessProfile = () => {
     <input
       className={businessProfileStyles.input}
       value={meta.email || ""}
+      type='email'
+      required
       onChange={(e) => updateMeta("email", e.target.value)}
       placeholder="business@example.com"
     />
@@ -450,11 +459,11 @@ const BusinessProfile = () => {
      />
   </div>
   <div>
-    <label className = {businessProfileStyles.label}>GST Number</label>
+    <label className = {businessProfileStyles.label}>VAT Number</label>
     <input 
     className = {businessProfileStyles.input}
-    value = {meta.gst || ""}
-    onChange = {(e) => updateMeta("gst", e.target.value)}
+    value = {meta.vat || ""}
+    onChange = {(e) => updateMeta("vat", e.target.value)}
     placeholder = "27DFGJSDKFJLK2LKDJG"
     />
   </div>
@@ -575,7 +584,7 @@ const BusinessProfile = () => {
                             min = "0" 
                             max = "100" 
                             step = "0.1" 
-                            className = {businessProfileStyles.taxInput} value = {meta.defaultTaxPercent ?? 18} onChange = {(e) => 
+                            className = {businessProfileStyles.taxInput} value = {meta.defaultTaxPercent ?? 20} onChange = {(e) => 
                                     updateMeta(
                                         "defaultTaxPercent",
                                         Number(e.target.value || 0)

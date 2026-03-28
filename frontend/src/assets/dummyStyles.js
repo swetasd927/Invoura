@@ -689,7 +689,7 @@ export const heroStyles = {
     "w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm",
   cardClient: "flex flex-col",
   cardClientName: "font-bold text-gray-900 text-base sm:text-lg",
-  cardClientGst: "text-xs sm:text-sm text-gray-500",
+  cardClientVat: "text-xs sm:text-sm text-gray-500",
   cardInvoiceInfo: "text-right mt-3 sm:mt-0",
   cardInvoiceLabel: "text-xs font-semibold text-gray-500 uppercase tracking-wider",
   cardInvoiceNumber: "font-bold text-gray-900 text-base sm:text-lg",

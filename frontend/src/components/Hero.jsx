@@ -157,8 +157,8 @@ const Hero = () => {
                                         <div className={heroStyles.cardClientName}>
                                             Acme Corporation
                                         </div>
-                                        <div className={heroStyles.cardClientGst}>
-                                            GST: 27AAAPL1234C1ZV
+                                        <div className={heroStyles.cardClientVAt}>
+                                            VAT: 27AAAPL1234C1ZV
                                         </div>
                                     </div>
                                 </div>
@@ -206,7 +206,7 @@ const Hero = () => {
                   </div>
                   <div className={heroStyles.calculationRow}>
                     <span className={heroStyles.calculationLabel}>
-                      GST (18%)
+                      VAT (20%)
                     </span>
                     <span className={heroStyles.calculationValue}>₹3,240</span>
                   </div>
