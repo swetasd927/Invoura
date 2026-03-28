@@ -137,7 +137,7 @@ useEffect(() => {
   return (
     <header className={navbarStyles.header}>
         <div className={navbarStyles.container}>
-            <nav className={navbarStyles.logoSection}>
+            <nav className={navbarStyles.nav}>
                 <div className={navbarStyles.logoSection}>
                     <Link to = '/' className = {navbarStyles.logoLink}>
                         <img src={logo} alt="logo" className={navbarStyles.logoImage} />

@@ -6,10 +6,10 @@ import { useNavigate } from "react-router-dom";
 import { invoicesStyles } from "../assets/dummyStyles";
 import { useAuth } from "@clerk/clerk-react";
 
-const API_BASE = "http://localhost:4000";
+const API_BASE = "http://localhost:5000";
 
-/* ---------- helpers ---------- */
-/* ----------------- frontend-only: normalize image URLs ----------------- */
+/*helpers*/
+/*frontend-only: normalize image URLs*/
 function resolveImageUrl(url) {
   if (!url) return null;
   const s = String(url).trim();
@@ -33,7 +33,7 @@ function resolveImageUrl(url) {
     }
   }
 
-  // relative paths like "/uploads/..." or "uploads/..." -> prefix with API_BASE
+  // relative paths like /uploads/ or uploads/ prefix with API_BASE
   return `${API_BASE.replace(/\/+$/, "")}/${s.replace(/^\/+/, "")}`;
 }//it will render the image coming from the server side
 

@@ -1012,7 +1012,9 @@ export const navbarStyles = {
   
   // Desktop Auth Buttons
   authSection: "hidden md:flex items-center gap-4",
-  signInButton: "text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors duration-200 px-4 py-2 rounded-2xl hover:bg-gray-50/80 backdrop-blur-sm",
+  //signInButton: "text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors duration-200 px-4 py-2 rounded-2xl hover:bg-gray-50/80 backdrop-blur-sm",
+  // Update this in navbarStyles
+signInButton: "text-sm font-medium text-gray-700 px-5 py-2.5 rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 backdrop-blur-sm",
   signUpButton: "group relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 hover:from-blue-700 hover:to-indigo-700 overflow-hidden",
   signUpOverlay: "absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300",
   signUpText: "relative",
