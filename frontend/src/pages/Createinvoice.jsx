@@ -8,11 +8,8 @@ import {
   createInvoiceCustomStyles,
 } from "../assets/dummyStyles";
 
-/* ---------- API BASE ---------- */
 const API_BASE = "http://localhost:5000";
 
-/* ---------- storage helpers (unchanged) ---------- */
-/* ----------------- frontend-only: normalize image URLs ----------------- */
 function resolveImageUrl(url) {
   if (!url) return null;
   const s = String(url).trim();
@@ -25,7 +22,7 @@ function resolveImageUrl(url) {
     try {
       const parsed = new URL(s);
       if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
-        // rewrite localhost -> API_BASE (preserve path/search/hash)
+        // rewrite localhost API_BASE to preserve path/search/hash
         const path =
           parsed.pathname + (parsed.search || "") + (parsed.hash || "");
         return `${API_BASE.replace(/\/+$/, "")}${path}`;
@@ -36,7 +33,7 @@ function resolveImageUrl(url) {
     }
   }
 
-  // relative paths like "/uploads/..." or "uploads/..." -> prefix with API_BASE
+  //it relative paths like "/uploads/..." or "uploads/" prefix with API_BASE
   return `${API_BASE.replace(/\/+$/, "")}/${s.replace(/^\/+/, "")}`;
 }
 //it will render the image coming from the server side
@@ -56,7 +53,7 @@ function writeJSON(key, val) {
   } catch {}
 }
 
-/* ---------- local invoices helpers (fallback) ---------- */
+//local global invoices handlers
 function getStoredInvoices() {
   return readJSON("invoices_v1", []) || [];
 }
@@ -64,7 +61,7 @@ function saveStoredInvoices(arr) {
   writeJSON("invoices_v1", arr);
 }
 
-/* ---------- util ---------- */
+//utils
 function uid() {
   try {
     if (typeof crypto !== "undefined" && crypto.randomUUID)
@@ -102,7 +99,6 @@ function computeTotals(items = [], taxPercent = 0) {
   return { subtotal, tax, total };
 }
 
-/* ---------- icons ---------- (kept same as before) */
 const PreviewIcon = ({ className = "w-4 h-4" }) => (
   <svg
     className={className}
@@ -164,7 +160,6 @@ const AddIcon = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
-/* ---------- Component (Create / Edit Invoice) ---------- */
 export default function CreateInvoice() {
   const navigate = useNavigate();
   const { id } = useParams(); // if editing, id will be present
@@ -228,7 +223,7 @@ export default function CreateInvoice() {
   // profile fetched from server
   const [profile, setProfile] = useState(null);
 
-  /* ---------- helpers for invoice editing ---------- */
+  /*helpers for invoice editing*/
   function updateInvoiceField(field, value) {
     setInvoice((inv) => (inv ? { ...inv, [field]: value } : inv));
   }
@@ -307,7 +302,7 @@ export default function CreateInvoice() {
     );
   }
 
-  /* ---------- helper: check candidate invoiceNumber exists on server/local ---------- */
+  /*helper:check candidate invoiceNumber exists on server/local*/
   const checkInvoiceExists = useCallback(
     async (candidate) => {
       // Check local storage first
@@ -336,38 +331,14 @@ export default function CreateInvoice() {
         if (Array.isArray(data) && data.length > 0) return true;
         return false;
       } catch (err) {
-        // network / other error -> assume not exists (we rely on server-side check on save)
+        // network / other error: assume not exists (we rely on server-side check on save)
         return false;
       }
     },
     [obtainToken]
   );
 
-  /* ---------- generator: create a candidate and ensure uniqueness (tries up to N times) ---------- */
-  const generateUniqueInvoiceNumber = useCallback(
-    async (attempts = 10) => {
-      for (let i = 0; i < attempts; i++) {
-        const datePart = new Date()
-          .toISOString()
-          .slice(0, 10)
-          .replace(/-/g, "");
-        const rand = Math.floor(Math.random() * 9000) + 1000; // 4 digit
-        const candidate = `INV-${datePart}-${rand}`;
-        // quick local check first
-        const exists = await checkInvoiceExists(candidate);
-        if (!exists) return candidate;
-        // else loop to try again
-      }
-      // fallback: use uid suffix if all attempts collide (very unlikely)
-      return `INV-${new Date()
-        .toISOString()
-        .slice(0, 10)
-        .replace(/-/g, "")}-${uid().slice(0, 4)}`;
-    },
-    [checkInvoiceExists]
-  );
-
-  /* ---------- fetch business profile as soon as page loads (when signed in) ---------- */
+  /*fetch business profile as soon as page loads (when signed in)*/
   useEffect(() => {
     let mounted = true;
 
@@ -383,10 +354,8 @@ export default function CreateInvoice() {
             Accept: "application/json",
           },
         });
-        if (!res.ok) {
-          // don't throw — just ignore profile if not accessible
-          return;
-        }
+        if (!res.ok) return;
+        
         const json = await res.json().catch(() => null);
         const data = json?.data || json || null;
         if (!data || !mounted) return;
@@ -406,7 +375,6 @@ export default function CreateInvoice() {
         };
 
         setProfile(serverProfile);
-
         // Merge into invoice only if those invoice fields are empty/unset
         setInvoice((prev) => {
           if (!prev) return prev;
@@ -472,14 +440,14 @@ export default function CreateInvoice() {
     };
   }, [isSignedIn, obtainToken]);
 
-  /* ---------- load invoice when editing (server first, fallback local) ---------- */
+  /*load invoice when editing (server first, fallback local) */
   useEffect(() => {
     let mounted = true;
 
     async function prepare() {
       // If AI/Gemini passed an invoice via location.state
       if (invoiceFromState) {
-        // merge then normalize any image URLs that may be `http://localhost:...`
+        // merge then normalize any image URLs that may be localhost
         const base = { ...buildDefaultInvoice(), ...invoiceFromState };
 
         base.logoDataUrl =
@@ -526,7 +494,7 @@ export default function CreateInvoice() {
               merged.id = data._id ?? data.id ?? merged.id;
               merged.invoiceNumber = data.invoiceNumber ?? merged.invoiceNumber;
 
-              // normalize server-returned image fields (rewrite localhost/relative -> API_BASE)
+              // normalize server-returned image fields (rewrite localhost/relative : API_BASE)
               merged.logoDataUrl =
                 resolveImageUrl(
                   data.logoDataUrl ?? data.logoUrl ?? data.logo
@@ -555,7 +523,6 @@ export default function CreateInvoice() {
             }
           }
         } catch (err) {
-          // ignore and fallback
           console.warn(
             "Server invoice fetch failed, will fallback to local:",
             err
@@ -608,7 +575,7 @@ export default function CreateInvoice() {
       // generate unique invoice number for new invoices
       if (!isEditing) {
         try {
-          const candidate = await generateUniqueInvoiceNumber(10);
+          const candidate = await generateUniqueInvoiceNumber();
           if (mounted) {
             setInvoice((inv) =>
               inv ? { ...inv, invoiceNumber: candidate } : inv
@@ -626,7 +593,6 @@ export default function CreateInvoice() {
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     id,
     invoiceFromState,
@@ -635,13 +601,63 @@ export default function CreateInvoice() {
     generateUniqueInvoiceNumber,
   ]);
 
-  /* ---------- Save invoice to backend (POST or PUT) using Clerk token ---------- */
+  const generateUniqueInvoiceNumber = async () => {
+    
+      const date = new Date().toISOString().slice(0,10).replace(/-/g, "");
+      const rand = Math.floor(Math.random() *9000) + 1000;
+      const candidate = `INV-${date}-${rand}`;
+    try{
+      const token = await obtainToken();
+      const headers = {Accept: "application/json"};
+      if(token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(`${API_BASE}/api/invoice?invoiceNumber = ${candidate}`, {
+        method: "GET",
+        headers,
+      });
+      const json = await res.json().catch(() => null);
+      const data = json?.data || [];
+
+      //if already exists generates new one recursively
+      if(Array.isArray(data) && data.length > 0) {
+        return await generateUniqueInvoiceNumber();
+      }
+      return candidate;
+    }
+    catch {
+      //when server check fails, return candidate
+      return candidate;
+    }
+  }
+
+  /*Save invoice to backend (POST or PUT) using Clerk token*/
   async function handleSave() {
     if (!invoice) return;
+
+    //checking
+    
+  if (!invoice.fromBusinessName?.trim()) {
+    alert("Business name is required."); return;
+  }
+  if (!/^[a-zA-Z\s\.\,\&\-]{2,100}$/.test(invoice.fromBusinessName.trim())) {
+    alert("Business name must contain letters only."); return;
+  }
+  if (!invoice.client?.name?.trim()) {
+    alert("Client name is required."); return;
+  }
+  if (!/^[a-zA-Z\s\.\,\&\-]{2,100}$/.test(invoice.client.name.trim())) {
+    alert("Client name must contain letters only."); return;
+  }
+  if (!invoice.issueDate) {
+    alert("Invoice date is required."); return;
+  }
+  if (items.length === 0) {
+    alert("Please add at least one item."); return;
+  }
+
     setLoading(true);
 
     try {
-      // Build prepared object but OMIT invoiceNumber when empty so server auto-generates.
+      // Build prepared object but OMIT invoiceNumber when empty
       const prepared = {
         issueDate: invoice.issueDate || "",
         dueDate: invoice.dueDate || "",
@@ -681,7 +697,7 @@ export default function CreateInvoice() {
           : `${API_BASE}/api/invoice`;//it is a post route to create the invoice in the mongoDB
       const method = isEditing && invoice.id ? "PUT" : "POST";
 
-      // try to obtain Clerk token; if present include Authorization
+      // try to obtain Clerk token if present include Authorization
       const token = await obtainToken();
       const headers = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -808,9 +824,7 @@ export default function CreateInvoice() {
   }
 
   const totals = computeTotals(items, invoice?.taxPercent ?? 18);
-  //UI section
 
-  /* ---------- JSX (kept structure, invoiceNumber input prefills generated value) ---------- */
   return (
     <div className={createInvoiceStyles.pageContainer}>
       {/* Header Section */}
@@ -869,6 +883,7 @@ export default function CreateInvoice() {
             </svg>
           </div>
           <h2 className={createInvoiceStyles.cardTitle}>Invoice Details</h2>
+          
         </div>
 
         <div className={createInvoiceStyles.gridCols3}>
@@ -880,6 +895,7 @@ export default function CreateInvoice() {
                 updateInvoiceField("invoiceNumber", e.target.value)
               }
               className={createInvoiceStyles.inputMedium}
+              required
             />
           </div>
 
@@ -890,6 +906,7 @@ export default function CreateInvoice() {
               value={invoice?.issueDate || ""}
               onChange={(e) => updateInvoiceField("issueDate", e.target.value)}
               className={createInvoiceStyles.input}
+              required
             />
           </div>
 
@@ -1031,6 +1048,9 @@ export default function CreateInvoice() {
                   }
                   placeholder="Your Business Name"
                   className={createInvoiceStyles.input}
+                  required
+                  pattern="^[a-zA-Z\s\.\,\&\-]{2,100}$"
+                  title = "Business name must contains only letters (min 2 characters)"
                 />
               </div>
               <div>
@@ -1063,8 +1083,11 @@ export default function CreateInvoice() {
                   onChange={(e) =>
                     updateInvoiceField("fromPhone", e.target.value)
                   }
-                  placeholder="+1 (555) 123-4567"
+                  placeholder="+977 98XXXXXXXX"
                   className={createInvoiceStyles.input}
+                  type="tel"
+                  pattern="^\+?[\d\s\-\(\)]{7,15}$"
+                  title="Phone must be 7-15 digits only"
                 />
               </div>
               <div>
@@ -1107,8 +1130,11 @@ export default function CreateInvoice() {
                 <input
                   value={invoice?.client?.name || ""}
                   onChange={(e) => updateClient("name", e.target.value)}
-                  placeholder="Client Name"
                   className={createInvoiceStyles.input}
+                  placeholder="Client Name"
+                  pattern="^[a-zA-Z\s\.\,\&\-]{2,100}$"
+                  title="Client name must contain only letters (min 2 characters)"
+                  required
                 />
               </div>
               <div>
@@ -1116,9 +1142,11 @@ export default function CreateInvoice() {
                   Client Email
                 </label>
                 <input
+                type="email"
                   value={invoice?.client?.email || ""}
                   onChange={(e) => updateClient("email", e.target.value)}
                   placeholder="client@email.com"
+                  required
                   className={createInvoiceStyles.input}
                 />
               </div>
