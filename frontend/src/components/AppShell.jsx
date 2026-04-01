@@ -238,7 +238,7 @@ const AppShell = () => {
                   </div>
                   {!collapsed && (
                     <div className={appShellStyles.logoTextContainer}>
-                      <span className={appShellStyles.logoText}>InvoiceAI</span>
+                      <span className={appShellStyles.logoText}>Invoura</span>
                       <div className={appShellStyles.logoUnderline}></div>
                     </div>
                   )}

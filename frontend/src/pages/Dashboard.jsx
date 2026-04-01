@@ -87,7 +87,6 @@ function capitalize(s) {
   return String(s).charAt(0).toUpperCase() + String(s).slice(1);
 }
 
-/* ---------- date formatting helper: DD/MM/YYYY ---------- */
 function formatDate(dateInput) {
   if (!dateInput) return "—";
   const d = dateInput instanceof Date ? dateInput : new Date(String(dateInput));
@@ -98,7 +97,6 @@ function formatDate(dateInput) {
   return `${dd}/${mm}/${yyyy}`;
 }
 
-// CHANGE 1: moved outside component
 const HARD_RATES = {
   USD_TO_NPR: 83,
 };

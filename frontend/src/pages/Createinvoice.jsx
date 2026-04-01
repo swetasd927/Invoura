@@ -1418,7 +1418,7 @@ export default function CreateInvoice() {
                   </label>
                   <input
                     type="number"
-                    value={invoice.taxPercent ?? 18}
+                    value={invoice.taxPercent ?? 20}
                     onChange={(e) =>
                       updateInvoiceField(
                         "taxPercent",
