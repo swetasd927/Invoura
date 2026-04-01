@@ -106,6 +106,8 @@ const BusinessProfile = () => {
   const [meta, setMeta] = useState({});
   const [saving, setSaving] = useState(false);
 
+  const [profileExists, setProfileExists] = useState(false);//track if profile exists
+
   // CONDENSED file / preview state
   const [files, setFiles] = useState({//stores images
     logo: null,
@@ -139,7 +141,7 @@ const BusinessProfile = () => {
       if (!isSignedIn) return;
       const token = await getAuthToken();
       if (!token) {
-        console.warn("No auth token available — cannot fetch BusinessProfile");
+        console.warn("No auth token available, cannot fetch BusinessProfile");
         return;
       }
 
@@ -151,7 +153,14 @@ const BusinessProfile = () => {
             Accept: "application/json",
           },
         });
+        //when no profile exists then
+        if(res.status === 404) {
+          console.log("No business profile found, user can create one");
+          setProfileExists(false);
+          return;
+        }
 
+        //handle non ok response
         if (!res.ok) {
           if (res.status !== 204 && res.status !== 401)
             console.error("Failed to fetch business profile:", res.status);
@@ -161,6 +170,8 @@ const BusinessProfile = () => {
         const json = await res.json().catch(() => null);
         const data = json?.data;
         if (!data || !mounted) return;
+        //when profile exists
+        setProfileExists(true);
 
         const serverMeta = {
           businessName: data.businessName ?? "",
@@ -286,12 +297,18 @@ const BusinessProfile = () => {
       if (files.signature) fd.append("signatureNameMeta", files.signature);
       else if (meta.signatureUrl) fd.append("signatureUrl", meta.signatureUrl);
 
-      const profileId = meta.profileId;
-      const url = profileId
-        ? `${API_BASE}/api/businessProfile/${profileId}`//edit route
-        : `${API_BASE}/api/businessProfile`;//creation route
-      const method = profileId ? "PUT" : "POST";
+      // const profileId = meta.profileId;
+      // const url = profileId
+      //   ? `${API_BASE}/api/businessProfile/${profileId}`//edit route
+      //   : `${API_BASE}/api/businessProfile`;//creation route
+      // const method = profileId ? "PUT" : "POST";
 
+       const profileId = meta.profileId;
+      const url = profileExists && profileId
+        ? `${API_BASE}/api/businessProfile/${profileId}` // UPDATE existing profile
+        : `${API_BASE}/api/businessProfile`; // CREATE new profile
+      const method = profileExists && profileId ? "PUT" : "POST";
+      
       const res = await fetch(url, {
         method,
         headers: { Authorization: `Bearer ${token}` },
@@ -324,6 +341,7 @@ const BusinessProfile = () => {
       };
 
       setMeta(merged);//saved in the DB
+      setProfileExists(true);
 
       if (saved.logoUrl)
         setPreviews((p) => ({ ...p, logo: resolveImageUrl(saved.logoUrl) }));
