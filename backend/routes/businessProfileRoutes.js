@@ -4,6 +4,7 @@ import path from 'path';
 
 import { clerkMiddleware } from '@clerk/express';
 import { createBusinessProfile, updateBusinessProfile, getBusinessProfile } from '../controllers/businessProfileController.js';
+
 const businessProfileRouter = express.Router();
 
 const storage = multer.diskStorage({

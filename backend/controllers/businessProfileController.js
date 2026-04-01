@@ -12,9 +12,9 @@ function uploadedFilesToUrls(req){
     const stampArr = req.files.stampName || req.files.stamp || [];
     const sigArr = req.files.signatureNameMeta || req.files.signature || [];
 
-    if(logoArr[0]) urls.logoUrl = `${API_BASE}/uploads/${logoArr[0].fileName}`;
-    if(stampArr[0]) urls.stampUrl = `${API_BASE}/uploads/${stampArr[0].fileName}`;
-    if(sigArr[0]) urls.stampUrl = `${API_BASE}/uploads/${sigArr[0].fileName}`;
+    if(logoArr[0]) urls.logoUrl = `${API_BASE}/uploads/${logoArr[0].filename}`;
+    if(stampArr[0]) urls.stampUrl = `${API_BASE}/uploads/${stampArr[0].filename}`;
+    if(sigArr[0]) urls.signatureUrl = `${API_BASE}/uploads/${sigArr[0].filename}`;
 
     return urls;
 }
@@ -144,7 +144,7 @@ export async function getBusinessProfile(req, res){
         const profile = await BusinessProfile.findOne({owner: userId}).lean();
         if(!profile){
             return res.status(404).json({
-                success: true,
+                success: false,
                 message: "No profile found"
             })
         }
