@@ -1,10 +1,12 @@
-import React, {useState, useEffect} from 'react';
-import { businessProfileStyles, iconColors, customStyles } from '../assets/dummyStyles';
-import { useAuth, useUser } from '@clerk/clerk-react';
-
+import React, { useState, useEffect } from "react";
+import {
+  businessProfileStyles,
+  iconColors,
+  customStyles,
+} from "../assets/dummyStyles";
+import { useAuth, useUser } from "@clerk/clerk-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
-
 
 //icons
 const UploadIcon = ({ className = "w-5 h-5" }) => (
@@ -99,17 +101,17 @@ function resolveImageUrl(url) {
 }
 
 const BusinessProfile = () => {
-
- const { getToken, isSignedIn } = useAuth();
+  const { getToken, isSignedIn } = useAuth();
   const { user } = useUser();
 
   const [meta, setMeta] = useState({});
   const [saving, setSaving] = useState(false);
 
-  const [profileExists, setProfileExists] = useState(false);//track if profile exists
+  const [profileExists, setProfileExists] = useState(false); //track if profile exists
 
   // CONDENSED file / preview state
-  const [files, setFiles] = useState({//stores images
+  const [files, setFiles] = useState({
+    //stores images
     logo: null,
     stamp: null,
     signature: null,
@@ -119,6 +121,8 @@ const BusinessProfile = () => {
     stamp: null,
     signature: null,
   });
+
+  //validation done here
 
   // helper: safely get token (tries forceRefresh once)
   async function getAuthToken() {
@@ -130,11 +134,10 @@ const BusinessProfile = () => {
     } catch {
       return null;
     }
-
   }
 
-    //fetch user profile if saved previously
-    useEffect(() => {
+  //fetch user profile if saved previously
+  useEffect(() => {
     let mounted = true;
 
     async function fetchProfile() {
@@ -154,7 +157,7 @@ const BusinessProfile = () => {
           },
         });
         //when no profile exists then
-        if(res.status === 404) {
+        if (res.status === 404) {
           console.log("No business profile found, user can create one");
           setProfileExists(false);
           return;
@@ -236,13 +239,13 @@ const BusinessProfile = () => {
       kind === "logo"
         ? "logoUrl"
         : kind === "stamp"
-        ? "stampUrl"
-        : "signatureUrl",
-      objUrl
+          ? "stampUrl"
+          : "signatureUrl",
+      objUrl,
     );
   }
 
-//you can remove the preview file by this function if you want to change it or remove it 
+  //you can remove the preview file by this function if you want to change it or remove it
   function removeLocalFile(kind) {
     const prev = previews[kind];
     if (prev && typeof prev === "string" && prev.startsWith("blob:")) {
@@ -254,20 +257,70 @@ const BusinessProfile = () => {
       kind === "logo"
         ? "logoUrl"
         : kind === "stamp"
-        ? "stampUrl"
-        : "signatureUrl",
-      null
+          ? "stampUrl"
+          : "signatureUrl",
+      null,
     );
   }
 
+  function validate() {
+    // Business Name
+    if (!meta.businessName?.trim() || meta.businessName.trim().length < 2) {
+      alert("Business name must be at least 2 characters.");
+      return false;
+    }
+
+    // Email
+    if (!meta.email?.trim()) {
+      alert("Email is required.");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(meta.email.trim())) {
+      alert("Please enter a valid email address.");
+      return false;
+    }
+
+    // Phone (optional but if filled, must be valid)
+    if (meta.phone && !/^\+?[\d\s\-().]{7,20}$/.test(meta.phone.trim())) {
+      alert("Phone number format is invalid. Min 7 digits.");
+      return false;
+    }
+
+    // Address (optional but if filled, must have letters)
+    if (meta.address && meta.address.trim().length < 5) {
+      alert("Please enter a valid address (min 5 characters).");
+      return false;
+    }
+    if (meta.address && /^[\d\s,.\-/#&']*$/.test(meta.address.trim())) {
+      alert("Address must contain at least some letters.");
+      return false;
+    }
+
+    // VAT (optional but if filled, must have both letters and numbers)
+    if (meta.vat) {
+      if (meta.vat.length < 5) {
+        alert("VAT number must be at least 5 characters.");
+        return false;
+      }
+      if (!/\d/.test(meta.vat)) {
+        alert("VAT number must contain at least one number.");
+        return false;
+      }
+      if (!/[A-Z]/.test(meta.vat)) {
+        alert("VAT number must contain at least one letter.");
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   //to save the business profile in the DB
-   async function handleSave(e) {
+  async function handleSave(e) {
     e?.preventDefault();
+    if (!validate()) return;
 
-
-
-
-  setSaving(true);
+    setSaving(true);
 
     try {
       const token = await getAuthToken();
@@ -303,12 +356,13 @@ const BusinessProfile = () => {
       //   : `${API_BASE}/api/businessProfile`;//creation route
       // const method = profileId ? "PUT" : "POST";
 
-       const profileId = meta.profileId;
-      const url = profileExists && profileId
-        ? `${API_BASE}/api/businessProfile/${profileId}` // UPDATE existing profile
-        : `${API_BASE}/api/businessProfile`; // CREATE new profile
+      const profileId = meta.profileId;
+      const url =
+        profileExists && profileId
+          ? `${API_BASE}/api/businessProfile/${profileId}` // UPDATE existing profile
+          : `${API_BASE}/api/businessProfile`; // CREATE new profile
       const method = profileExists && profileId ? "PUT" : "POST";
-      
+
       const res = await fetch(url, {
         method,
         headers: { Authorization: `Bearer ${token}` },
@@ -340,7 +394,7 @@ const BusinessProfile = () => {
         profileId: saved._id ?? meta.profileId ?? saved.id ?? meta.profileId,
       };
 
-      setMeta(merged);//saved in the DB
+      setMeta(merged); //saved in the DB
       setProfileExists(true);
 
       if (saved.logoUrl)
@@ -361,11 +415,11 @@ const BusinessProfile = () => {
       setSaving(false);
     }
   }
-//to remove the profile the image saved in the uploads will get deleted
+  //to remove the profile the image saved in the uploads will get deleted
   function handleClearProfile() {
     if (
       !confirm(
-        "Clear current profile data? This will remove local changes and previews."
+        "Clear current profile data? This will remove local changes and previews.",
       )
     )
       return;
@@ -380,132 +434,138 @@ const BusinessProfile = () => {
     setPreviews({ logo: null, stamp: null, signature: null });
   }
 
+  return (
+    <div className={businessProfileStyles.pageContainer}>
+      <div className={businessProfileStyles.headerContainer}>
+        <h1 className={businessProfileStyles.headerTitle}>Business Profile</h1>
+        <p className={businessProfileStyles.headerSubtitle}>
+          Configure your company details, branding assets and invoice defaults
+        </p>
 
-    return (
-        <div className = {businessProfileStyles.pageContainer}>
-            <div className = {businessProfileStyles.headerContainer}>
-                <h1 className = {businessProfileStyles.headerTitle}>
-                    Business Profile
-                </h1>
-                <p className = {businessProfileStyles.headerSubtitle}>
-                    Configure your company details, branding assets and invoice defaults
-                </p>
-
-                {!isSignedIn && (
-                    <div style = {{
-                        marginTop: 12,
-                        color: '#92400e',
-                        background: '#fff7ed',
-                        padding: 10,
-                        borderRadius: 8,
-
-                    }}
-                    >
-                        You are not signed in - changes can not be saved. Please sign in to load and save your business profile
-                    </div>
-                )}
+        {!isSignedIn && (
+          <div
+            style={{
+              marginTop: 12,
+              color: "#92400e",
+              background: "#fff7ed",
+              padding: 10,
+              borderRadius: 8,
+            }}
+          >
+            You are not signed in, changes can not be saved. Please sign in to
+            load and save your business profile
+          </div>
+        )}
+      </div>
+      <form
+        onSubmit={handleSave}
+        className={businessProfileStyles.pageContainer}
+      >
+        {/*business info*/}
+        <div className="grid grid-cols-2 gap-4">
+          {/* LEFT COLUMN */}
+          <div className="flex flex-col gap-4">
+            <div>
+              <label className={businessProfileStyles.label}>
+                Business Name
+              </label>
+              <input
+                className={businessProfileStyles.input}
+                value={meta.businessName || ""}
+                required
+                minLength={2}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (/^[a-zA-Z\s.\-&]*$/.test(val))
+                    updateMeta("businessName", val);
+                }}
+                maxLength={50}
+                placeholder="Enter your business name"
+              />
             </div>
-            <form onSubmit = {handleSave} className = {businessProfileStyles.pageContainer} >
-                {/*business info*/}
-                <div className = {businessProfileStyles.cardContainer}>
-                    <div className = {businessProfileStyles.cardHeaderContainer}>
-                        <div className = {`${businessProfileStyles.cardIconContainer} ${iconColors.business}`}>
+            <div>
+              <label className={businessProfileStyles.label}>Email</label>
+              <input
+                className={businessProfileStyles.input}
+                value={meta.email || ""}
+                type="email"
+                required
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\s/g, "");
+                  updateMeta("email", val);
+                }}
+                maxLength={50}
+                placeholder="business@example.com"
+              />
+            </div>
+            <div>
+              <label className={businessProfileStyles.label}>Phone</label>
+              <input
+                className={businessProfileStyles.input}
+                value={meta.phone || ""}
+                maxLength={15}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (/^[\d\s\+\-().]*$/.test(val)) updateMeta("phone", val);
+                }}
+                placeholder="+1 (555) 123-4567"
+              />
+            </div>
+          </div>
 
-                            <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4m0 4h4" />
-              </svg>
-                    </div>
-                    <h2 className = {businessProfileStyles.cardTitle}>
-                        Business Information
-                    </h2>
-                    </div>
-                    <div className= {businessProfileStyles.gridCols2}>
-                        <div>
-                            <label className = {businessProfileStyles.label}>
-                                Business Name
-                            </label>
-                            <input className = {businessProfileStyles.input}
-                            value = {meta.businessName || ""}
-                            required
-                            minLength={2}
-                            maxLength={100}
-                            onChange = {(e) => updateMeta("businessName", e.target.value)}
-                            placeholder = "Enter your business name "
-                            />
-                        </div>
-                    </div>
-                    <div className={businessProfileStyles.gridCols2}>
-  <div>
-    <label className={businessProfileStyles.label}>
-      Email
-    </label>
-    <input
-      className={businessProfileStyles.input}
-      value={meta.email || ""}
-      type='email'
-      required
-      onChange={(e) => updateMeta("email", e.target.value)}
-      placeholder="business@example.com"
-    />
-  </div>
-  <div className={businessProfileStyles.gridCols2}>
-  
-    <label className={businessProfileStyles.label}>
-      Address
-    </label>
-    <textarea rows = {3} 
-        className = {businessProfileStyles.textarea}
-        value = {meta.address || ""}
-        onChange = {(e) => updateMeta("address", e.target.value)}
-        placeholder = "Enter your business address"
-    >
-
-    </textarea>
-    
-  </div>
-  <div>
-    <label className = {businessProfileStyles.label}>Phone</label>
-    <input
-    className = {businessProfileStyles.input}
-    value = {meta.phone || ""}
-    onChange = {(e) => updateMeta("phone", e.target.value)}
-    placeholder = "+1 (555) 123-4567"
-     />
-  </div>
-  <div>
-    <label className = {businessProfileStyles.label}>VAT Number</label>
-    <input 
-    className = {businessProfileStyles.input}
-    value = {meta.vat || ""}
-    onChange = {(e) => updateMeta("vat", e.target.value)}
-    placeholder = "27DFGJSDKFJLK2LKDJG"
-    />
-  </div>
-</div>
-</div>
-
-{/*BRANDING AND DEFAULTS*/}
-<div className = {businessProfileStyles.cardContainer}>
-    <div className = {businessProfileStyles.cardHeaderContainer} >
-        <div className = {`${businessProfileStyles.cardIconContainer} ${
-            iconColors.branding
-        }`}>
-            <ImageIcon className = "w-5 h-5" />
-
+          {/* RIGHT COLUMN */}
+          <div className="flex flex-col gap-4">
+            <div className="flex-1">
+              <label className={businessProfileStyles.label}>Address</label>
+              <textarea
+                rows={5}
+                className={`${businessProfileStyles.textarea} w-full`}
+                value={meta.address || ""}
+                maxLength={50}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val.length > 50) return;
+                  if (val.length > 3 && /^[\d\s,.\-/#&']*$/.test(val)) return;
+                  if (/^[a-zA-Z0-9\s,.\-/#&']*$/.test(val))
+                    updateMeta("address", val);
+                }}
+                placeholder="Enter your business address"
+              />
+            </div>
+            <div>
+              <label className={businessProfileStyles.label}>VAT Number</label>
+              <input
+                className={businessProfileStyles.input}
+                value={meta.vat || ""}
+                onChange={(e) => {
+                  const val = e.target.value
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9]/g, "");
+                  if (val.length <= 20) updateMeta("vat", val);
+                }}
+                placeholder="27DFGJSDKFJLK2LKDJG"
+              />
+            </div>
+          </div>
         </div>
-        <h2 className = {businessProfileStyles.cardTitle}>
-            Branding & Defaults
-        </h2>
-    </div>
-    {/*Logo */}
-    <div className = {businessProfileStyles.gridCols2Lg}>
-        {/* Logo Upload */}
+
+        {/*BRANDING AND DEFAULTS*/}
+        <div className={businessProfileStyles.cardContainer}>
+          <div className={businessProfileStyles.cardHeaderContainer}>
+            <div
+              className={`${businessProfileStyles.cardIconContainer} ${
+                iconColors.branding
+              }`}
+            >
+              <ImageIcon className="w-5 h-5" />
+            </div>
+            <h2 className={businessProfileStyles.cardTitle}>
+              Branding & Defaults
+            </h2>
+          </div>
+          {/*Logo */}
+          <div className={businessProfileStyles.gridCols2Lg}>
+            {/* Logo Upload */}
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
@@ -526,7 +586,7 @@ const BusinessProfile = () => {
                             e.currentTarget.style.display = "none";
                             console.warn(
                               "[BusinessProfile] logo preview failed to load:",
-                              previews.logo
+                              previews.logo,
                             );
                           }}
                         />
@@ -589,71 +649,69 @@ const BusinessProfile = () => {
             </div>
 
             {/*Tax setting*/}
-            <div className = "space-y-6">
-                <div>
-                    <h3 className = "text-lg font-medium text-gray-900 mb-4">
-                        Tax Settings
-                    </h3>
-                    <div className = {businessProfileStyles.taxContainer}>
-                        <label className = {businessProfileStyles.label}>
-                            Default Tax Percentage
-                        </label>
-                        <div className = "flex item-center gap-3">
-                            <input 
-                            type = "number" 
-                            min = "0" 
-                            max = "100" 
-                            step = "0.1" 
-                            className = {businessProfileStyles.taxInput} value = {meta.defaultTaxPercent ?? 20} onChange = {(e) => 
-                                    updateMeta(
-                                        "defaultTaxPercent",
-                                        Number(e.target.value || 0)
-                                    )
-                                }
-                            />
-                            <span className = {customStyles.taxPercentage}>%</span>
-                            </div>
-                        <p className = {businessProfileStyles.taxHelpText}>
-                            This tax reate will prefill in new invoices.You can adjust it as per invoice as needed.
-                        </p>
-                    </div>
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  Tax Settings
+                </h3>
+                <div className={businessProfileStyles.taxContainer}>
+                  <label className={businessProfileStyles.label}>
+                    Default Tax Percentage
+                  </label>
+                  <div className="flex item-center gap-3">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      className={businessProfileStyles.taxInput}
+                      value={meta.defaultTaxPercent ?? 20}
+                      onChange={(e) =>
+                        updateMeta(
+                          "defaultTaxPercent",
+                          Number(e.target.value || 0),
+                        )
+                      }
+                    />
+                    <span className={customStyles.taxPercentage}>%</span>
+                  </div>
+                  <p className={businessProfileStyles.taxHelpText}>
+                    This tax rate will prefill in new invoices.You can adjust it
+                    as per invoice as needed.
+                  </p>
                 </div>
-            </div>
-    </div>
-
-</div>
-
-              {/*Footer actions */}  
-              <div className = {businessProfileStyles.actionContainer}>
-                <div className = {businessProfileStyles.actionInnerContainer}>
-                    <div className = {businessProfileStyles.actionButtonGroup}>
-                        <button
-                        type = "submit"
-                        onClick = {handleSave}
-                        disabled = {saving}
-                        className = {businessProfileStyles.saveButton}
-                        >
-                            <SaveIcon className = "w-4 h-4" />{" "}
-                            {saving ? "Saving..." : "Save Profile"}
-                        </button>
-
-                        <button type = "button"
-                        onClick = {handleClearProfile}
-                        className = {businessProfileStyles.resetButton}>
-                            <ResetIcon className = "w-4 h-4" /> Clear Profile
-
-                        </button>
-                    </div>
-
-                </div>
-
               </div>
-
-            </form>
-            
+            </div>
+          </div>
         </div>
-    )
-}
 
+        {/*Footer actions */}
+        <div className={businessProfileStyles.actionContainer}>
+          <div className={businessProfileStyles.actionInnerContainer}>
+            <div className={businessProfileStyles.actionButtonGroup}>
+              <button
+                type="submit"
+                //onClick={handleSave}
+                disabled={saving}
+                className={businessProfileStyles.saveButton}
+              >
+                <SaveIcon className="w-4 h-4" />{" "}
+                {saving ? "Saving..." : "Save Profile"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleClearProfile}
+                className={businessProfileStyles.resetButton}
+              >
+                <ResetIcon className="w-4 h-4" /> Clear Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
 
 export default BusinessProfile;
