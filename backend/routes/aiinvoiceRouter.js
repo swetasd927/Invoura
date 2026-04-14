@@ -1,3 +1,4 @@
+
 import express from 'express';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from 'dotenv';
@@ -166,3 +167,4 @@ aiInvoiceRouter.post('/generate', async (req, res) => {
 });
 
 export default aiInvoiceRouter;
+//works
