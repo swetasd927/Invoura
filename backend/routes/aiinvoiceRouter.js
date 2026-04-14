@@ -1,22 +1,24 @@
 import express from 'express';
-import { GoogleGenAI } from  "@google/genai";
+//import { GoogleGenAI } from  "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from 'dotenv';
 
 dotenv.config();
 const aiInvoiceRouter = express.Router();
 
-const API_KEY = process.env.GEMINI_API_KEY
+const API_KEY = process.env.GEMINI_API_KEY;
 if(!API_KEY){
     console.warn("No Gemini Key found in the .env");  
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY});
-//models to try
+const genAI = new GoogleGenAI({ apiKey: API_KEY});
+ //models to try
 const MODEL_CANDIDATES = [
-    "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-2.0",
+    "gemini-2.0-flash-exp",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
 ];
+
 
 function buildInvoicePrompt(promptText){
     const invoiceTemplate = {
@@ -29,7 +31,7 @@ function buildInvoicePrompt(promptText){
         fromPhone: "",
         client: {name: "", email: "", address: "", phone: ""},
         items: [{id: "1", description: "", qty: 1, unitPrice: 0}],
-        taxPercent: 18,
+        taxPercent: 20,
         notes: ""
     };
     return `
@@ -50,58 +52,90 @@ function buildInvoicePrompt(promptText){
      `;
 }
 //it will try a few common possibilities in the order
+// async function tryGenerateWithModel(modelName, prompt){
+//     const response = await ai.models.generateContent({
+//         model: modelName,
+//         contents: prompt,
+//     });
+
+//     let text = 
+//         (response && typeof response.text === "string" && response.text) ||
+//         (response && 
+//             response.output &&
+//             Array.isArray(response.output) &&
+//             response.output[0] &&
+//             response.output[0].content &&
+//             Array.isArray(response.output[0].content) &&
+//             response.output[0].content[0] &&
+//             response.output[0].content[0].text) ||
+//         (response &&
+//             response.outputs &&
+//             Array.isArray(response.outputs) &&
+//             response.outputs[0] &&
+//             (response.outputs[0].text || response.outputs[0].content)) ||
+//             null;
+
+//         if(!text && response && Array.isArray(response.outputs)){
+//             const joined = response.outputs
+//                 .map((o) => {
+//                     if(!o) return "";
+//                     if(typeof o === "string") return o;
+//                     if(typeof o.text === "string") return o.text;
+//                     if(Array.isArray(o.content)){
+//                         return o.content.map((c) => (c && c.text) || "").join("\n");
+//                     }
+//                     return JSON.stringify(o);
+//                 })
+//                 .filter(Boolean)
+//                 .join("\n\n");
+//             if(joined) text = joined;
+
+        
+//  if(!text && response){
+//             try{
+//                 text = JSON.stringify(response);
+//             }catch{
+//                 text = String(response);
+//             }
+//         }
+//         if(!text || !String(text).trim()){
+//             throw new Error("Empty text returned from model");
+//         }
+//         return { text: String(text).trim(), modelName };
+//         }   
+// }   
+
+// async function tryGenerateWithModel(modelName, prompt){
+//     const model = genAI.getGenerativeModel({ model: modelName });
+//     const result = await model.generateContent(prompt);
+//     const response = result.response;
+//     const text = response.text();
+
+//     if(!text || !String(text).trim()){
+//         throw new Error("Empty text returned from model");
+//     }
+//     return { text: String(text).trim(), modelName };
+// } 
+
+
 async function tryGenerateWithModel(modelName, prompt){
-    const response = await ai.models.generateContent({
-        model: modelName,
-        contents: prompt,
-    });
+    try {
+        const model = genAI.getGenerativeModel({ model: modelName });  // ✅ Now genAI is defined
+        const result = await model.generateContent(prompt);
+        const response = result.response;
+        const text = response.text();
 
-    let text = 
-        (response && typeof response.text === "string" && response.text) ||
-        (response && 
-            response.output &&
-            Array.isArray(response.output) &&
-            response.output[0] &&
-            response.output[0].content &&
-            Array.isArray(response.output[0].content) &&
-            response.output[0].content[0] &&
-            response.output[0].content[0].text) ||
-        (response &&
-            response.outputs &&
-            Array.isArray(response.outputs) &&
-            response.outputs[0] &&
-            (response.outputs[0].text || response.outputs[0].content)) ||
-            null;
-
-        if(!text && response && Array.isArray(response.outputs)){
-            const joined = response.outputs
-                .map((o) => {
-                    if(!o) return "";
-                    if(typeof o === "string") return o;
-                    if(typeof o.text === "string") return o.text;
-                    if(Array.isArray(o.content)){
-                        return o.content.map((c) => (c && c.text) || "").join("\n");
-                    }
-                    return JSON.stringify(o);
-                })
-                .filter(Boolean)
-                .join("\n\n");
-            if(joined) text = joined;
-
-        if(!text && response){
-            try{
-                text = JSON.stringify(response);
-            }catch{
-                text = String(response);
-            }
-        }
         if(!text || !String(text).trim()){
             throw new Error("Empty text returned from model");
         }
         return { text: String(text).trim(), modelName };
+    } catch (error) {
+        console.error(`Error with model ${modelName}:`, error.message);
+        throw error;
     }
-}
-aiInvoiceRouter.post('/generate', async (requestAnimationFrame, res) => {
+} 
+
+aiInvoiceRouter.post('/generate', async (req, res) => {
     try {
         if(!API_KEY){
             return res.status(500).json({
@@ -185,14 +219,18 @@ aiInvoiceRouter.post('/generate', async (requestAnimationFrame, res) => {
         });
     }
     
-    catch (error) {
+    catch (err) {
         console.error("AI invoice generation error:", err);
         return res.status(500).json({
             success: false,
             message: "AI generation failed",
-            detail: error?.message || String(err)
+            detail: err?.message || String(err)
         })
     }
 });
 
 export default aiInvoiceRouter;
+
+
+
+

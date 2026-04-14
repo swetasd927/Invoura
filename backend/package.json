@@ -11,6 +11,8 @@
   "description": "",
   "dependencies": {
     "@clerk/express": "^1.7.65",
+    "@google/genai": "^1.48.0",
+    "@google/generative-ai": "^0.24.1",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
@@ -20,7 +22,6 @@
     "mongoose": "^9.1.5",
     "multer": "^2.0.2",
     "nodemon": "^3.1.11",
-    "validator": "^13.15.26",
-     "@google/genai": "^1.39.0"
+    "validator": "^13.15.26"
   }
 }

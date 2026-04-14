@@ -15,9 +15,32 @@ const AIInvoiceModal = ({open, onClose, onGenerate, initialText = ""}) => {
     }, [open, initialText]);
 
     if(!open) return null;
-//hi hello how are you
-// i am sweta dahal
-    async function handleGenerateClick() {
+
+    // async function handleGenerateClick() {
+    //     setError("");
+    //     const raw = (text || "").trim();
+    //     if(!raw) {
+    //         setError("Please paste invoice text to generate from AI.");
+    //         return;
+    //     }
+    //     try {
+    //         setLoading(true);
+    //         const maybePromise = onGenerate && onGenerate(raw);
+    //         if(maybePromise && typeof maybePromise.then === "function" ){
+    //             await maybePromise;
+    //         } 
+    //     } catch (err) {
+    //             console.error("onGenerate handler failed:", err);
+    //             const msg = err && (err.message || (typeof err === "string" ? err: JSON.stringify(err)));
+    //             setError(msg || "Failed to generate. Try again");
+    //         }
+    //         finally {
+    //             setLoading(false);
+    //         }
+    // }
+
+
+async function handleGenerateClick() {
         setError("");
         const raw = (text || "").trim();
         if(!raw) {
@@ -31,14 +54,29 @@ const AIInvoiceModal = ({open, onClose, onGenerate, initialText = ""}) => {
                 await maybePromise;
             } 
         } catch (err) {
-                console.error("onGenerate handler failed:", err);
-                const msg = err && (err.message || (typeof err === "string" ? err: JSON.stringify(err)));
-                setError(msg || "Failed to generate. Try again");
+            console.error("onGenerate handler failed:", err);
+            
+            let errorMessage = "Failed to generate. Try again.";
+            
+            if (err && err.message) {
+                errorMessage = err.message;
+            } else if (typeof err === "string") {
+                errorMessage = err;
+            } else {
+                try {
+                    errorMessage = JSON.stringify(err);
+                } catch {
+                    errorMessage = String(err);
+                }
             }
-            finally {
-                setLoading(false);
-            }
+            
+            console.log("Full error details:", errorMessage);
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
+        }
     }
+
   return (
     <div className={aiInvoiceModalStyles.overlay}>
         <div className={aiInvoiceModalStyles.backdrop} onClick={() => onClose && onClose()}></div>

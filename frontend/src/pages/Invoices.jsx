@@ -439,147 +439,294 @@ export default function InvoicesPage() {
   // AI flow: call AI -> create invoice on backend (requires auth).
   // NOTE: If the AI provider returns quota/429 (or any non-ok), this function throws
   // an Error with a readable message — the modal will display it.
-  async function handleGenerateFromAI(rawText) {
+//   async function handleGenerateFromAI(rawText) {
+//     setAiLoading(true);
+//     try {
+//       // Prefer server-side AI if available
+//       if (API_BASE) {
+//         const token = await obtainToken();
+//         const aiRes = await fetch(`${API_BASE}/api/ai/generate`, {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//             ...(token ? { Authorization: `Bearer ${token}` } : {}),
+//           },
+//           body: JSON.stringify({ prompt: rawText }),
+//         });
+
+//         const bodyText = await aiRes.text().catch(() => null);
+
+//         // try parse JSON if possible
+//         let bodyJson = null;
+//         try {
+//           bodyJson = bodyText ? JSON.parse(bodyText) : null;
+//         } catch (e) {
+//           bodyJson = null;
+//         }
+
+//         // if server returned an error status: surface clear message (esp. 429/quota)
+//         // if (!aiRes.ok) {
+//         //   const serverMessage =
+//         //     (bodyJson && (bodyJson.message || bodyJson.detail)) ||
+//         //     bodyText ||
+//         //     `AI generate failed (${aiRes.status})`;
+
+//         //   if (
+//         //     aiRes.status === 429 ||
+//         //     /quota|exhausted|resource_exhausted/i.test(serverMessage)
+//         //   ) {
+//         //     // explicit quota message
+//         //     throw new Error(`AI provider quota/exhausted: ${serverMessage}`);
+//         //   }
+
+//         //   // Other server errors
+//         //   throw new Error(serverMessage);
+//         // }
+//         if (!aiRes.ok) {
+//   console.error("AI generate raw error body:", bodyText);
+
+//   const serverMessage =
+//     (bodyJson &&
+//       (bodyJson.message ||
+//         bodyJson.error ||
+//         bodyJson.detail ||
+//         JSON.stringify(bodyJson))) ||
+//     bodyText ||
+//     `AI generate failed (${aiRes.status})`;
+
+//   if (
+//     aiRes.status === 429 ||
+//     /quota|exhausted|resource_exhausted/i.test(serverMessage)
+//   ) {
+//     throw new Error(`AI provider quota/exhausted: ${serverMessage}`);
+//   }
+
+//   throw new Error(`[${aiRes.status}] ${serverMessage}`);
+// }
+
+//         // OK - parse AI invoice
+//         const aiJson =
+//           bodyJson ||
+//           (await (async () => {
+//             try {
+//               return JSON.parse(bodyText || "");
+//             } catch {
+//               return null;
+//             }
+//           })());
+
+//         const aiInvoice = aiJson?.data || aiJson;
+//         if (!aiInvoice) {
+//           throw new Error("AI returned no invoice data (unexpected response).");
+//         }
+
+//         // Now send to create invoice endpoint (backend) if we have token (requires auth)
+//         const tokenForCreate = await obtainToken();
+//         if (tokenForCreate) {
+//           const createRes = await fetch(`${API_BASE}/api/invoice`, {
+//             method: "POST",
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${tokenForCreate}`,
+//             },
+//             body: JSON.stringify(aiInvoice),
+//           });
+
+//           if (!createRes.ok) {
+//             const errText = await createRes.text().catch(() => null);
+//             let errJson = null;
+//             try {
+//               errJson = errText ? JSON.parse(errText) : null;
+//             } catch {}
+//             const errMsg =
+//               (errJson && (errJson.message || errJson.detail)) ||
+//               errText ||
+//               `Create failed (${createRes.status})`;
+//             throw new Error(errMsg);
+//           }
+
+//           const createJson = await createRes.json().catch(() => null);
+//           const saved = normalizeInvoiceFromServer(
+//             createJson?.data || createJson
+//           );
+//           await fetchInvoices();
+//           setAiOpen(false);
+//           navigate(`/app/invoices/${saved.id}/edit`, {
+//             state: { invoice: saved },
+//           });
+//           return;
+//         } else {
+//           // no token: creation requires sign-in
+//           throw new Error(
+//             "Creating invoice requires sign-in. Please sign in to save the AI-generated invoice."
+//           );
+//         }
+//       }
+
+//       // If API_BASE not configured, fallback to UI-only creation (unchanged)
+//       const newId = `INV-${Math.floor(Math.random() * 900000) + 1000}`;
+//       const firstLine =
+//         (rawText || "")
+//           .split(/\r?\n/)
+//           .map((l) => l.trim())
+//           .find(Boolean) || "";
+//       const clientPlaceholder = firstLine.length
+//         ? firstLine.length > 60
+//           ? firstLine.slice(0, 57) + "..."
+//           : firstLine
+//         : "";
+
+//       const newInvoice = {
+//         id: newId,
+//         invoiceNumber: newId,
+//         issueDate: new Date().toISOString().slice(0, 10),
+//         dueDate: "",
+//         client: clientPlaceholder || "",
+//         items: [],
+//         currency: "NPR",
+//         status: "Draft",
+//         notes: "",
+//         taxPercent: 18,
+//         aiSource: rawText,
+//       };
+
+//       setAllInvoices((prev) => [newInvoice, ...(prev || [])]);
+//       setAiOpen(false);
+//       navigate(`/app/invoices/${newId}/edit`, {
+//         state: { invoice: newInvoice },
+//       });
+//     } finally {
+//       setAiLoading(false);
+//     }
+//   }
+
+
+
+
+
+
+
+
+
+async function handleGenerateFromAI(rawText) {
     setAiLoading(true);
     try {
-      // Prefer server-side AI if available
-      if (API_BASE) {
+        console.log('Calling AI generate API...');
+        
         const token = await obtainToken();
         const aiRes = await fetch(`${API_BASE}/api/ai/generate`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({ prompt: rawText }),
-        });
-
-        const bodyText = await aiRes.text().catch(() => null);
-
-        // try parse JSON if possible
-        let bodyJson = null;
-        try {
-          bodyJson = bodyText ? JSON.parse(bodyText) : null;
-        } catch (e) {
-          bodyJson = null;
-        }
-
-        // if server returned an error status: surface clear message (esp. 429/quota)
-        if (!aiRes.ok) {
-          const serverMessage =
-            (bodyJson && (bodyJson.message || bodyJson.detail)) ||
-            bodyText ||
-            `AI generate failed (${aiRes.status})`;
-
-          if (
-            aiRes.status === 429 ||
-            /quota|exhausted|resource_exhausted/i.test(serverMessage)
-          ) {
-            // explicit quota message
-            throw new Error(`AI provider quota/exhausted: ${serverMessage}`);
-          }
-
-          // Other server errors
-          throw new Error(serverMessage);
-        }
-
-        // OK - parse AI invoice
-        const aiJson =
-          bodyJson ||
-          (await (async () => {
-            try {
-              return JSON.parse(bodyText || "");
-            } catch {
-              return null;
-            }
-          })());
-
-        const aiInvoice = aiJson?.data || aiJson;
-        if (!aiInvoice) {
-          throw new Error("AI returned no invoice data (unexpected response).");
-        }
-
-        // Now send to create invoice endpoint (backend) if we have token (requires auth)
-        const tokenForCreate = await obtainToken();
-        if (tokenForCreate) {
-          const createRes = await fetch(`${API_BASE}/api/invoice`, {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${tokenForCreate}`,
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({ prompt: rawText }),
+        });
+
+        console.log('AI Response status:', aiRes.status);
+
+        // Read response body once
+        const bodyText = await aiRes.text();
+        console.log('Response body (first 200 chars):', bodyText.substring(0, 200));
+
+        let bodyJson = null;
+        try {
+            bodyJson = bodyText ? JSON.parse(bodyText) : null;
+        } catch (parseError) {
+            console.error('Failed to parse response as JSON:', parseError);
+            // If response isn't JSON, it might be an HTML error page
+            if (bodyText.includes('<!DOCTYPE') || bodyText.includes('<html')) {
+                throw new Error(`Server returned HTML instead of JSON. Status: ${aiRes.status}. Check your backend route.`);
+            }
+        }
+
+        // Handle error responses
+        if (!aiRes.ok) {
+            console.error("AI API Error - Status:", aiRes.status);
+            console.error("Response body:", bodyJson || bodyText);
+
+            const serverMessage =
+                (bodyJson && (bodyJson.detail || bodyJson.message)) ||
+                `AI generation failed with status ${aiRes.status}`;
+
+            // Check for quota errors
+            if (
+                aiRes.status === 429 ||
+                /quota|exhausted|resource_exhausted/i.test(serverMessage)
+            ) {
+                throw new Error(`AI quota exhausted. Please try again later.`);
+            }
+
+            throw new Error(serverMessage);
+        }
+
+        // Success - parse invoice data
+        const aiInvoice = bodyJson?.data || bodyJson;
+        if (!aiInvoice) {
+            throw new Error("AI returned no invoice data");
+        }
+
+        console.log('AI invoice generated:', aiInvoice);
+
+        // Create invoice on backend
+        const tokenForCreate = await obtainToken();
+        if (!tokenForCreate) {
+            throw new Error("Sign in required to save invoice");
+        }
+
+        console.log('Saving invoice to database...');
+        
+        const createRes = await fetch(`${API_BASE}/api/invoice`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenForCreate}`,
             },
             body: JSON.stringify(aiInvoice),
-          });
+        });
 
-          if (!createRes.ok) {
-            const errText = await createRes.text().catch(() => null);
+        if (!createRes.ok) {
+            const errText = await createRes.text();
             let errJson = null;
             try {
-              errJson = errText ? JSON.parse(errText) : null;
+                errJson = JSON.parse(errText);
             } catch {}
-            const errMsg =
-              (errJson && (errJson.message || errJson.detail)) ||
-              errText ||
-              `Create failed (${createRes.status})`;
+            const errMsg = errJson?.message || errText || `Create failed (${createRes.status})`;
             throw new Error(errMsg);
-          }
-
-          const createJson = await createRes.json().catch(() => null);
-          const saved = normalizeInvoiceFromServer(
-            createJson?.data || createJson
-          );
-          await fetchInvoices();
-          setAiOpen(false);
-          navigate(`/app/invoices/${saved.id}/edit`, {
-            state: { invoice: saved },
-          });
-          return;
-        } else {
-          // no token: creation requires sign-in
-          throw new Error(
-            "Creating invoice requires sign-in. Please sign in to save the AI-generated invoice."
-          );
         }
-      }
 
-      // If API_BASE not configured, fallback to UI-only creation (unchanged)
-      const newId = `INV-${Math.floor(Math.random() * 900000) + 1000}`;
-      const firstLine =
-        (rawText || "")
-          .split(/\r?\n/)
-          .map((l) => l.trim())
-          .find(Boolean) || "";
-      const clientPlaceholder = firstLine.length
-        ? firstLine.length > 60
-          ? firstLine.slice(0, 57) + "..."
-          : firstLine
-        : "";
-
-      const newInvoice = {
-        id: newId,
-        invoiceNumber: newId,
-        issueDate: new Date().toISOString().slice(0, 10),
-        dueDate: "",
-        client: clientPlaceholder || "",
-        items: [],
-        currency: "NPR",
-        status: "Draft",
-        notes: "",
-        taxPercent: 18,
-        aiSource: rawText,
-      };
-
-      setAllInvoices((prev) => [newInvoice, ...(prev || [])]);
-      setAiOpen(false);
-      navigate(`/app/invoices/${newId}/edit`, {
-        state: { invoice: newInvoice },
-      });
+        const createJson = await createRes.json();
+        const saved = normalizeInvoiceFromServer(createJson?.data || createJson);
+        
+        console.log('Invoice saved successfully:', saved.id);
+        
+        await fetchInvoices();
+        setAiOpen(false);
+        navigate(`/app/invoices/${saved.id}/edit`, {
+            state: { invoice: saved },
+        });
+        
+    } catch (err) {
+        console.error(" handleGenerateFromAI error:", err);
+        throw err; // Re-throw so modal can display it
     } finally {
-      setAiLoading(false);
+        setAiLoading(false);
     }
-  }
+}
 
-  // Helper: client initial
+
+
+
+
+
+
+
+
+
+
+
+
+// Helper: client initial
   const getClientInitial = (client) => {
     const c = normalizeClient(client);
     return c.name ? c.name.charAt(0).toUpperCase() : "C";
