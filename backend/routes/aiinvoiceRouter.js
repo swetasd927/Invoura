@@ -7,8 +7,15 @@ dotenv.config();
 const aiInvoiceRouter = express.Router();
 
 const API_KEY = process.env.GEMINI_API_KEY;
-if(!API_KEY){
-    console.warn("No Gemini Key found in the .env");  
+// if(!API_KEY){
+//     console.warn("No Gemini Key found in the .env");  
+// }
+
+
+if (!API_KEY) {
+    console.warn("No Gemini Key found in the .env");
+} else {
+    console.log(`Gemini API Key loaded: ${API_KEY.slice(0, 6)}...${API_KEY.slice(-4)} (Length: ${API_KEY.length})`);
 }
 
 const genAI = new GoogleGenAI({ apiKey: API_KEY});
@@ -17,6 +24,7 @@ const MODEL_CANDIDATES = [
     "gemini-2.0-flash-exp",
     "gemini-1.5-flash",
     "gemini-1.5-pro",
+    "gemini-flash-latest",
 ];
 
 
