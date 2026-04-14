@@ -151,7 +151,7 @@ export async function createInvoice(req, res){
                 signatureTitle: body.signatureTitle || "",
                 notes: body.notes || body.aiSource || "",
             });
-            //Save with retry on duplicate-key(race conditions)
+            //Save with retry on duplicate-key race conditions
             let saved = null;
             let attempts = 0;
             const maxSaveAttempts = 6;
@@ -160,7 +160,7 @@ export async function createInvoice(req, res){
                     saved = await doc.save();
                     break; //success
                 } catch(err){
-                    //If dublicate invoiceNumber (race), regenerate and retry
+                    //If dublicate invoiceNumber race, regenerate and retry
                     if(err && err.code === 11000 && err.keyPattern && err.keyPattern.invoiceNumber){
                         attempts += 1;
                         //generate a new invoiceNumber and set on doc
@@ -169,7 +169,6 @@ export async function createInvoice(req, res){
                         //loop to try save again
                         continue;
                     }
-                    //other error -> rethrow
                     throw err;
                 }
                 
@@ -407,8 +406,7 @@ export async function deleteInvoice(req, res){
             });
         }
         const { id } = req.params;
-        // const body = req.body || {};
-
+        
         const query = isObjectIdString(id) ? {_id: id, owner: userId}
         : { invoiceNumber: id, owner: userId};
 

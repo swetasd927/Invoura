@@ -3,7 +3,6 @@ import BusinessProfile from "../models/businessProfileModel.js";
 
 const API_BASE = 'http://localhost:5000';
 
-//file to url
 function uploadedFilesToUrls(req){
     const urls = {};
     if(!req.files) return urls;
@@ -19,7 +18,6 @@ function uploadedFilesToUrls(req){
     return urls;
 }
 
-//create a business profile
 export async function createBusinessProfile(req, res){
     try{
         const { userId } = getAuth(req);
@@ -64,7 +62,6 @@ export async function createBusinessProfile(req, res){
         })
     }
 }
-//to update a business profile
 export async function updateBusinessProfile(req, res){
     try{
         const { userId } = getAuth(req);

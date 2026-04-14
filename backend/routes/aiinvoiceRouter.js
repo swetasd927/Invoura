@@ -14,7 +14,6 @@ if (!API_KEY) {
 }
 
 const genAI = new GoogleGenerativeAI(API_KEY);
-//models to try
 const MODEL_CANDIDATES = [
  "gemini-2.0-flash-exp",
  "gemini-1.5-flash",
@@ -167,4 +166,3 @@ aiInvoiceRouter.post('/generate', async (req, res) => {
 });
 
 export default aiInvoiceRouter;
-//works
