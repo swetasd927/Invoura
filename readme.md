@@ -1,10 +1,13 @@
+Got it — your README is mostly fine, only the **project structure section formatting is broken and inconsistent Markdown-wise**.
+
+Here is the **fixed and clean version of your README (only structure corrected, no emojis, proper formatting)**:
 
 ---
 
 ```md
 # AI Invoice Generator SaaS (MERN + Gemini AI)
 
-A full-stack SaaS application that generates professional invoices from plain text prompts using **Google Gemini AI**, built with the **MERN stack (MongoDB, Express, React, Node.js)**.
+A full-stack SaaS application that generates professional invoices from plain text prompts using Google Gemini AI, built with the MERN stack (MongoDB, Express, React, Node.js).
 
 Users can create invoices, manage clients, track payments, and monitor invoice status in a secure dashboard.
 
@@ -12,30 +15,30 @@ Users can create invoices, manage clients, track payments, and monitor invoice s
 
 ## Features
 
-- **AI Invoice Generation**
-  - Generate complete invoices using plain text prompts via **Google Gemini AI**
+- AI Invoice Generation
+  - Generate complete invoices using plain text prompts via Google Gemini AI
   - Smart extraction of client details, items, quantity, and pricing
 
-- **Authentication & Security**
+- Authentication & Security
   - JWT-based authentication
   - Secure user login & registration
   - Protected routes & role-based access
 
-- **Interactive Dashboard**
+- Interactive Dashboard
   - Modern UI built with React + Tailwind CSS
   - View all invoices in one place
   - Filter by status: Paid / Unpaid / Overdue
 
-- **Invoice Management**
+- Invoice Management
   - Create, update, delete invoices
   - Track invoice payment status
   - Auto-calculate totals & taxes
 
-- **Client Management**
+- Client Management
   - Store client details
   - Link clients to multiple invoices
 
-- **Payment Tracking**
+- Payment Tracking
   - Mark invoices as paid/unpaid
   - Track overdue invoices automatically
 
@@ -68,27 +71,29 @@ Users can create invoices, manage clients, track payments, and monitor invoice s
 ```
 
 root/
+├── client/                  # React Frontend
+│   ├── public/
+│   └── src/
+│       ├── components/
+│       ├── pages/
+│       ├── utils/
+│       └── App.js
 │
-├── client/               # React Frontend
-│   ├── src/
-│   ├── components/
-│   ├── pages/
-│   └── utils/
-│
-├── server/               # Node + Express Backend
+├── server/                  # Node + Express Backend
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
 │   ├── models/
 │   │   ├── User.js
 │   │   ├── Client.js
 │   │   ├── Invoice.js
-│   │
 │   ├── routes/
-│   ├── controllers/
-│   ├── middleware/
+│   ├── services/
 │   └── server.js
 │
 ├── .env
-├── README.md
-└── package.json
+├── package.json
+└── README.md
 
 ````
 
@@ -212,7 +217,7 @@ Example prompt:
 Create an invoice for John Doe for 3 web development services at $200 each, due in 7 days.
 ```
 
-Gemini AI will return structured JSON:
+Expected response:
 
 ```json
 {
@@ -246,7 +251,10 @@ Gemini AI will return structured JSON:
 
 ## Author
 
-**Sweta Dahal**
- Full-Stack Developer
+Sweta Dahal
+Full-Stack Developer
+
+```
 
 ---
+
