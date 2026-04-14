@@ -59,10 +59,7 @@ Users can create invoices, manage clients, track payments, and monitor invoice s
 - Google Gemini AI API
 
 ---
-
 ## Project Structure
-
-```
 
 root/
 ├── client/                  # React Frontend
@@ -88,9 +85,6 @@ root/
 ├── .env
 ├── package.json
 └── README.md
-
-````
-
 ---
 
 ## Database Schema
