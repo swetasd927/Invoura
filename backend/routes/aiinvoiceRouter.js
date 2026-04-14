@@ -7,8 +7,10 @@ dotenv.config();
 const aiInvoiceRouter = express.Router();
 
 const API_KEY = process.env.GEMINI_API_KEY;
-if(!API_KEY){
-    console.warn("No Gemini Key found in the .env");  
+if (!API_KEY) {
+    console.warn("No Gemini Key found in the .env");
+} else {
+    console.log(`Gemini API Key loaded: ${API_KEY.slice(0, 6)}...${API_KEY.slice(-4)} (Length: ${API_KEY.length})`);
 }
 
 const genAI = new GoogleGenAI({ apiKey: API_KEY});
@@ -17,6 +19,7 @@ const MODEL_CANDIDATES = [
     "gemini-2.0-flash-exp",
     "gemini-1.5-flash",
     "gemini-1.5-pro",
+    "gemini-flash-latest",
 ];
 
 
@@ -90,7 +93,7 @@ function buildInvoicePrompt(promptText){
 //                 .join("\n\n");
 //             if(joined) text = joined;
 
-        
+
 //  if(!text && response){
 //             try{
 //                 text = JSON.stringify(response);
@@ -118,14 +121,14 @@ function buildInvoicePrompt(promptText){
 // } 
 
 
-async function tryGenerateWithModel(modelName, prompt){
+async function tryGenerateWithModel(modelName, prompt) {
     try {
         const model = genAI.getGenerativeModel({ model: modelName });  // ✅ Now genAI is defined
         const result = await model.generateContent(prompt);
         const response = result.response;
         const text = response.text();
 
-        if(!text || !String(text).trim()){
+        if (!text || !String(text).trim()) {
             throw new Error("Empty text returned from model");
         }
         return { text: String(text).trim(), modelName };
@@ -133,34 +136,34 @@ async function tryGenerateWithModel(modelName, prompt){
         console.error(`Error with model ${modelName}:`, error.message);
         throw error;
     }
-} 
+}
 
 aiInvoiceRouter.post('/generate', async (req, res) => {
     try {
-        if(!API_KEY){
+        if (!API_KEY) {
             return res.status(500).json({
                 success: false,
                 message: "Server configuration failed no key found",
             });
         }
         const { prompt } = req.body;
-        if(!prompt || !prompt.trim()){
+        if (!prompt || !prompt.trim()) {
             return res.status(400).json({
                 success: false,
                 message: "Prompt text required"
             })
         }
-        const fullPrompt = buildInvoicePrompt( prompt );
+        const fullPrompt = buildInvoicePrompt(prompt);
         let lastErr = null;
         let lastText = null;
         let usedModel = null;
-        
-        for(const m of MODEL_CANDIDATES){
-            try{
+
+        for (const m of MODEL_CANDIDATES) {
+            try {
                 const { text, modelName } = await tryGenerateWithModel(m, fullPrompt);
                 lastText = text;
                 usedModel = modelName;
-                if(text && text.trim()) break;
+                if (text && text.trim()) break;
             }
             catch (err) {
                 console.warn(`Model ${m} failed:`, err?.message || err);
@@ -168,10 +171,10 @@ aiInvoiceRouter.post('/generate', async (req, res) => {
                 continue;
             }
         }
-        if(!lastText){
-            const errMsg = 
-            (lastErr && lastErr.message) ||
-            "All candidate models failed. Check API key, network, or model availability.";
+        if (!lastText) {
+            const errMsg =
+                (lastErr && lastErr.message) ||
+                "All candidate models failed. Check API key, network, or model availability.";
             console.error("AI generation failed (no text):", errMsg);
             return res.status(502).json({
                 success: false,
@@ -183,7 +186,7 @@ aiInvoiceRouter.post('/generate', async (req, res) => {
         const text = lastText.trim();
         const firstBrace = text.indexOf("{");
         const lastBrace = text.lastIndexOf("}");
-        if(firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace){
+        if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
             console.error("AI response did not contain JSON object:", {
                 usedModel,
                 text
@@ -197,7 +200,7 @@ aiInvoiceRouter.post('/generate', async (req, res) => {
         }
         const jsonText = text.slice(firstBrace, lastBrace + 1);
         let data;
-        try{
+        try {
             data = JSON.parse(jsonText);
         } catch (parseErr) {
             console.error("Failed to parse JSON from AI response:", parseErr, {
@@ -218,7 +221,7 @@ aiInvoiceRouter.post('/generate', async (req, res) => {
             data
         });
     }
-    
+
     catch (err) {
         console.error("AI invoice generation error:", err);
         return res.status(500).json({
