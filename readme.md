@@ -239,10 +239,8 @@ Expected response:
 
 ## Author
 
-Sweta Dahal
-Full-Stack Developer
+Sweta Dahal | Full-Stack Developer
 
 ```
 
----
 
