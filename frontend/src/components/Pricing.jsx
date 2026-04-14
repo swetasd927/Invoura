@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import { pricingStyles, pricingCardStyles } from '../assets/dummyStyles'
 import { SignedIn, SignedOut, useAuth, useClerk } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';

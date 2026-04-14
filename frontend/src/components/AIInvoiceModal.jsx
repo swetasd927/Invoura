@@ -16,29 +16,6 @@ const AIInvoiceModal = ({open, onClose, onGenerate, initialText = ""}) => {
 
     if(!open) return null;
 
-    // async function handleGenerateClick() {
-    //     setError("");
-    //     const raw = (text || "").trim();
-    //     if(!raw) {
-    //         setError("Please paste invoice text to generate from AI.");
-    //         return;
-    //     }
-    //     try {
-    //         setLoading(true);
-    //         const maybePromise = onGenerate && onGenerate(raw);
-    //         if(maybePromise && typeof maybePromise.then === "function" ){
-    //             await maybePromise;
-    //         } 
-    //     } catch (err) {
-    //             console.error("onGenerate handler failed:", err);
-    //             const msg = err && (err.message || (typeof err === "string" ? err: JSON.stringify(err)));
-    //             setError(msg || "Failed to generate. Try again");
-    //         }
-    //         finally {
-    //             setLoading(false);
-    //         }
-    // }
-
 
 async function handleGenerateClick() {
         setError("");

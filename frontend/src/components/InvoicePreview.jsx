@@ -130,7 +130,6 @@ function normalizeClient(raw) {
   return { name: "", email: "", address: "", phone: "" };
 }
 
-/* ----------------- icons ----------------- */
 const PrintIcon = ({ className = "w-4 h-4" }) => (
   <svg
     className={className}
@@ -167,7 +166,7 @@ const ArrowLeftIcon = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
-/* ----------------- component ----------------- */
+//component
 export default function InvoicePreview() {
   const { id } = useParams();
   const loc = useLocation();
