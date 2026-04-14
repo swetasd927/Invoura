@@ -1,6 +1,5 @@
 import express from 'express';
-import { GoogleGenAI } from  "@google/genai";
-//import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -13,8 +12,8 @@ if (!API_KEY) {
     console.log(`Gemini API Key loaded: ${API_KEY.slice(0, 6)}...${API_KEY.slice(-4)} (Length: ${API_KEY.length})`);
 }
 
-const genAI = new GoogleGenAI({ apiKey: API_KEY});
- //models to try
+const genAI = new GoogleGenerativeAI(API_KEY);
+//models to try
 const MODEL_CANDIDATES = [
     "gemini-2.0-flash-exp",
     "gemini-1.5-flash",
@@ -23,17 +22,17 @@ const MODEL_CANDIDATES = [
 ];
 
 
-function buildInvoicePrompt(promptText){
+function buildInvoicePrompt(promptText) {
     const invoiceTemplate = {
-        invoiceNumber: `INV-${Math.floor(Math.random()*9000)+1000}`,
+        invoiceNumber: `INV-${Math.floor(Math.random() * 9000) + 1000}`,
         issueDate: new Date().toISOString().slice(0, 10),
         dueDate: "",
         fromBusinessName: "",
         fromEmail: "",
         fromAddress: "",
         fromPhone: "",
-        client: {name: "", email: "", address: "", phone: ""},
-        items: [{id: "1", description: "", qty: 1, unitPrice: 0}],
+        client: { name: "", email: "", address: "", phone: "" },
+        items: [{ id: "1", description: "", qty: 1, unitPrice: 0 }],
         taxPercent: 20,
         notes: ""
     };
