@@ -1,9 +1,3 @@
-Got it — your README is mostly fine, only the **project structure section formatting is broken and inconsistent Markdown-wise**.
-
-Here is the **fixed and clean version of your README (only structure corrected, no emojis, proper formatting)**:
-
----
-
 ```md
 # AI Invoice Generator SaaS (MERN + Gemini AI)
 
