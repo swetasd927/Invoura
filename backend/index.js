@@ -12,14 +12,18 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 //Middleware
+
 app.use(cors({
     origin: [
-         process.env.CLIENT_URL || "http://localhost:5173",
-        "https://invoura.vercel.app",//be
-        "https://invourafe.vercel.app" //fe
+        process.env.CLIENT_URL || "http://localhost:5173",
+        "https://invoura.vercel.app",
+        "https://invouraa.vercel.app",
+        "https://invourafe.vercel.app",  
+        /^https:\/\/invourafe-.*\.vercel\.app$/  
     ],
-    methods: ["GET", "POST", "PUT", "PATCH", "OPTIONS"],
-    credentials: true
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(express.json({limit: "20mb"}));
