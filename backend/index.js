@@ -15,7 +15,7 @@ const port = process.env.PORT || 5000;
 app.use(cors({
     origin: [
          process.env.CLIENT_URL || "http://localhost:5173",
-        "https://invouraa.vercel.app",//be
+        "https://invoura.vercel.app",//be
         "https://invourafe.vercel.app" //fe
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "OPTIONS"],
