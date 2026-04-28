@@ -28,7 +28,8 @@ function resolveImageUrl(url) {
         return `${API_BASE.replace(/\/+$/, "")}${path}`;
       }
       return parsed.href;
-    } catch (e) {
+    } catch (err) {
+      console.error(`Err is: ${err}`)
       // fall through to relative handling
     }
   }
