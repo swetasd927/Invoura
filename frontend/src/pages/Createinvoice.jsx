@@ -8,7 +8,8 @@ import {
   createInvoiceCustomStyles,
 } from "../assets/dummyStyles";
 
-const API_BASE = "http://localhost:5000";
+//const API_BASE = "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
 
 function resolveImageUrl(url) {
   if (!url) return null;
@@ -328,22 +329,16 @@ export default function CreateInvoice() {
     }
   }, []); // no deps — uses only args and constants
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // SINGLE useEffect: fetch business profile AND load/init invoice in sequence
-  // so there are no race conditions between the two async operations.
-  // ─────────────────────────────────────────────────────────────────────────────
   useEffect(() => {
     let mounted = true;
 
     async function init() {
       setLoading(true);
 
-      // ── STEP 1: obtain token once, reuse everywhere below ──────────────────
       const token = isSignedIn ? await obtainToken() : null;
       const authHeaders = { Accept: "application/json" };
       if (token) authHeaders["Authorization"] = `Bearer ${token}`;
 
-      // ── STEP 2: fetch business profile (if signed in) ──────────────────────
       let serverProfile = null;
       if (isSignedIn && token) {
         try {
@@ -371,17 +366,12 @@ export default function CreateInvoice() {
               if (mounted) setProfile(serverProfile);
             }
           }
-          // if !res.ok (404, 401, etc.) we simply skip — not a fatal error
         } catch (err) {
           console.warn("Failed to fetch business profile:", err);
         }
       }
 
-      // ── STEP 3: load invoice data (edit / from-state / new) ────────────────
-
-      // 3a. If AI/Gemini passed an invoice via location.state
       if (invoiceFromState) {
-        // merge then normalize any image URLs that may be localhost
         const base = { ...buildDefaultInvoice(), ...invoiceFromState };
 
         base.logoDataUrl =
