@@ -34,7 +34,7 @@ app.use(cors({
         
         const allowedOrigins = [
             process.env.CLIENT_URL || "http://localhost:5173",
-            "http://localhost:3000",
+            "http://localhost:5000",
             "https://invoura.vercel.app",
             "https://invouraa.vercel.app",
             "https://invourafe.vercel.app",
