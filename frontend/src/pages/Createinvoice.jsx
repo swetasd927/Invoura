@@ -312,7 +312,11 @@ export default function CreateInvoice() {
       if (token) headers["Authorization"] = `Bearer ${token}`;
       const res = await fetch(
         `${API_BASE}/api/invoice?invoiceNumber=${encodeURIComponent(candidate)}`,
-        { method: "GET", headers },
+        { 
+          method: "GET",
+          credentials: 'include',
+           headers 
+        },
       );
       const json = await res.json().catch(() => null);
       const data = json?.data || [];
@@ -401,6 +405,7 @@ export default function CreateInvoice() {
         try {
           const res = await fetch(`${API_BASE}/api/invoice/${id}`, {
             method: "GET",
+            credentials: 'include',
             headers: authHeaders,
           });
           if (res.ok) {
@@ -637,6 +642,7 @@ export default function CreateInvoice() {
 
       const res = await fetch(endpoint, {
         method,
+        credentials: 'include',
         headers,
         body: JSON.stringify(prepared),
       });

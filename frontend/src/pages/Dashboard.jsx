@@ -146,6 +146,7 @@ const Dashboard = () => {
 
       const res = await fetch(`${API_BASE}/api/invoice`, {
         method: "GET",
+        credentials: 'include',
         headers,
       });
       const json = await res.json().catch(() => null);
@@ -196,6 +197,7 @@ const Dashboard = () => {
       if (!token) return;
       const res = await fetch(`${API_BASE}/api/businessProfile/me`, {
         method: "GET",
+        credentials: 'include',
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
