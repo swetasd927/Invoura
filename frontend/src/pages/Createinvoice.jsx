@@ -28,7 +28,8 @@ function resolveImageUrl(url) {
         return `${API_BASE.replace(/\/+$/, "")}${path}`;
       }
       return parsed.href;
-    } catch (e) {
+    } catch (err) {
+      console.error(`Err is ${err}`);
       // fall through to relative handling
     }
   }
@@ -50,7 +51,9 @@ function readJSON(key, fallback = null) {
 function writeJSON(key, val) {
   try {
     localStorage.setItem(key, JSON.stringify(val));
-  } catch {}
+  } catch (err) {
+    console.error(`Err is ${err}`);
+  }
 }
 
 //local global invoices handlers
@@ -66,7 +69,9 @@ function uid() {
   try {
     if (typeof crypto !== "undefined" && crypto.randomUUID)
       return crypto.randomUUID();
-  } catch {}
+  } catch (err) {
+    console.error(`Error is ${err}`);
+  }
   return Math.random().toString(36).slice(2, 9);
   //this generates random unique id
 }
@@ -181,6 +186,7 @@ export default function CreateInvoice() {
       }
       return token;
     } catch (err) {
+      console.error(`Err is ${err}`);
       return null;
     }
   }, [getToken]);
@@ -221,7 +227,7 @@ export default function CreateInvoice() {
   const [loading, setLoading] = useState(false);
 
   // profile fetched from server
-  const [profile, setProfile] = useState(null);
+  const [_profile, setProfile] = useState(null);
 
   /*helpers for invoice editing*/
   function updateInvoiceField(field, value) {
@@ -312,10 +318,10 @@ export default function CreateInvoice() {
       if (token) headers["Authorization"] = `Bearer ${token}`;
       const res = await fetch(
         `${API_BASE}/api/invoice?invoiceNumber=${encodeURIComponent(candidate)}`,
-        { 
+        {
           method: "GET",
-          credentials: 'include',
-           headers 
+          credentials: "include",
+          headers,
         },
       );
       const json = await res.json().catch(() => null);
@@ -359,7 +365,7 @@ export default function CreateInvoice() {
                 address: data.address ?? "",
                 phone: data.phone ?? "",
                 vat: data.vat ?? "",
-                defaultTaxPercent: data.defaultTaxPercent ?? 18,
+                defaultTaxPercent: data.defaultTaxPercent ?? 20,
                 signatureOwnerName: data.signatureOwnerName ?? "",
                 signatureOwnerTitle: data.signatureOwnerTitle ?? "",
                 logoUrl: data.logoUrl ?? null,
@@ -405,7 +411,7 @@ export default function CreateInvoice() {
         try {
           const res = await fetch(`${API_BASE}/api/invoice/${id}`, {
             method: "GET",
-            credentials: 'include',
+            credentials: "include",
             headers: authHeaders,
           });
           if (res.ok) {
@@ -571,7 +577,7 @@ export default function CreateInvoice() {
       alert("Business name is required.");
       return;
     }
-    if (!/^[a-zA-Z\s\.\,\&\-]{2,100}$/.test(invoice.fromBusinessName.trim())) {
+    if (!/^[a-zA-Z\s.,&-]{2,100}$/.test(invoice.fromBusinessName.trim())) {
       alert("Business name must contain letters only.");
       return;
     }
@@ -579,7 +585,7 @@ export default function CreateInvoice() {
       alert("Client name is required.");
       return;
     }
-    if (!/^[a-zA-Z\s\.\,\&\-]{2,100}$/.test(invoice.client.name.trim())) {
+    if (!/^[a-zA-Z\s.,&-]{2,100}$/.test(invoice.client.name.trim())) {
       alert("Client name must contain letters only.");
       return;
     }
@@ -642,7 +648,7 @@ export default function CreateInvoice() {
 
       const res = await fetch(endpoint, {
         method,
-        credentials: 'include',
+        credentials: "include",
         headers,
         body: JSON.stringify(prepared),
       });
@@ -1033,7 +1039,7 @@ export default function CreateInvoice() {
                   value={invoice?.fromPhone ?? ""}
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (/^[\d\s\+\-().]*$/.test(val) && val.length <= 15)
+                    if (/^[\d\s+\-().]*$/.test(val) && val.length <= 15)
                       updateInvoiceField("fromPhone", val);
                   }}
                   minLength={7}
@@ -1147,10 +1153,9 @@ export default function CreateInvoice() {
                   value={invoice?.client?.phone || ""}
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (/^[\d\s\+\-().]*$/.test(val) && val.length <= 15)
+                    if (/^[\d\s+\-().]*$/.test(val) && val.length <= 15)
                       updateClient("phone", val);
                   }}
-                  placeholder="+1 (555) 123-4567"
                   className={createInvoiceStyles.input}
                 />
               </div>
