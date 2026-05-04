@@ -29,7 +29,6 @@ const port = process.env.PORT || 5000;
 
 app.use(cors({
     origin: function(origin, callback) {
-        // Allow requests with no origin (mobile apps, Postman, curl, etc.)
         if (!origin) return callback(null, true);
         
         const allowedOrigins = [
@@ -40,7 +39,6 @@ app.use(cors({
             "https://invourafe.vercel.app",
         ];
         
-        // Check exact matches first
         if (allowedOrigins.includes(origin)) {
             return callback(null, true);
         }
@@ -58,9 +56,6 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["Content-Range", "X-Content-Range"]
 }));
-
-// Handle preflight requests explicitly
-app.options('*', cors());
 
 app.use(express.json({limit: "20mb"}));
 app.use(express.urlencoded({limit: "20mb", extended: true}));
